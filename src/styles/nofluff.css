@@ -1,0 +1,51 @@
+/*
+  No fluff mode (Customizations): strips the playful layer for serious studying.
+  Logic-side switches live next to each feature (pop-ups, ding, keys, Capi, timer messages).
+*/
+
+:root[data-fluff='off'] {
+  --panel: var(--surface);
+  --panel-muted: var(--muted);
+  --wallpaper-tint: transparent;
+}
+
+:root[data-fluff='off'] .doodle,
+:root[data-fluff='off'] .xp,
+:root[data-fluff='off'] .wordmark-ja,
+:root[data-fluff='off'] .xp-float,
+:root[data-fluff='off'] .popup-region,
+:root[data-fluff='off'] .keys-left,
+:root[data-fluff='off'] .notebook-tip,
+:root[data-fluff='off'] .bubble {
+  display: none !important;
+}
+
+:root[data-fluff='off'] .sheet,
+:root[data-fluff='off'] .panel,
+:root[data-fluff='off'] .studio-pane,
+:root[data-fluff='off'] .studio-head {
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+/* Plain cards: no ruled lines, no flip turn. */
+:root[data-fluff='off'] .index-face {
+  background-image: none;
+}
+
+:root[data-fluff='off'] .index-card-inner {
+  transition: none;
+}
+
+/* Things only shown to serious users */
+.serious-only {
+  display: none;
+}
+
+:root[data-fluff='off'] .serious-only {
+  display: revert;
+}
+
+:root[data-fluff='off'] .home-row {
+  grid-template-columns: minmax(0, 1fr);
+}

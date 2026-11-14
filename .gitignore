@@ -1,0 +1,17 @@
+node_modules
+dist
+*.local
+
+# env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# logs and OS/editor junk
+*.log
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json

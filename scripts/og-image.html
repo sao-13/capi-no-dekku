@@ -1,0 +1,286 @@
+<!doctype html>
+<!--
+  Share preview (Open Graph) image: Capi studying at a desk.
+  Render to public/og.png with headless Chrome (see CLAUDE.md > Run).
+  Art is drawn on a 200x105 grid and scaled 6x to 1200x630.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="../node_modules/@fontsource/dotgothic16/index.css" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background: #f3ead8;
+      }
+      canvas {
+        display: block;
+        image-rendering: pixelated;
+      }
+      .card {
+        position: absolute;
+        left: 48px;
+        top: 40px;
+        width: 456px;
+        padding: 24px 36px 28px;
+        background: #e9e3d2;
+        border: 6px solid #4a2c1e;
+        box-shadow: 12px 12px 0 #4a2c1e;
+        font-family: 'DotGothic16', monospace;
+        color: #2b2620;
+      }
+      .ja {
+        margin: 0;
+        font-size: 34px;
+        color: #8f442b;
+        letter-spacing: 0.08em;
+      }
+      h1 {
+        margin: 4px 0 12px;
+        font-size: 76px;
+        font-weight: 400;
+        line-height: 1;
+      }
+      .tag {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.35;
+        color: #625a4f;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c" width="1200" height="630"></canvas>
+    <div class="card">
+      <p class="ja">カピのデッキ</p>
+      <h1>Capi's Deck</h1>
+      <p class="tag">Flashcards, spaced repetition and a capybara study buddy.</p>
+    </div>
+    <script>
+      const W = 200, H = 105, S = 6;
+      const grid = Array.from({ length: H }, () => Array(W).fill(null));
+
+      const C = {
+        wall: '#f3ead8', wallDot: '#e6d9bf',
+        k: '#4a2c1e', ink: '#3a2a20',
+        b: '#c08a5a', l: '#d8a677', d: '#9c6a42', s: '#8a5c3b', n: '#3a2117', e: '#22140d', w: '#ffffff', p: '#e3907e',
+        muzzle: '#a8744a', rim: '#3b2a1f',
+        woodTop: '#c99464', woodHi: '#d8a677', wood: '#9c6a42', woodDark: '#7d5232', woodEdge: '#6e4a30',
+        page: '#f6efdf', line: '#c9bfa6', red: '#a9553a', green: '#6f8f4e', mustard: '#d9b44a', cream: '#e9e3d2',
+        sky1: '#f8dcc0', sky2: '#f4c3a2', sky3: '#eea184', branch: '#5c3b28', blossom: '#f0a8b4', blossomHi: '#fbd3da',
+        leaf: '#6fb04f', leafDark: '#4c8a3c', pot: '#c8694a', pencil: '#e3b93c', tip: '#2b2620', steam: '#c9bfa6',
+      };
+
+      const layer = () => new Map();
+      const set = (L, x, y, c) => { if (x >= 0 && x < W && y >= 0 && y < H) L.set(y * W + x, c); };
+      const rect = (L, x, y, w, h, c) => { for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) set(L, i, j, c); };
+      const roundRect = (L, x, y, w, h, r, c) => {
+        for (let j = y; j < y + h; j++)
+          for (let i = x; i < x + w; i++) {
+            const dx = Math.max(x + r - (i + 0.5), i + 0.5 - (x + w - r), 0);
+            const dy = Math.max(y + r - (j + 0.5), j + 0.5 - (y + h - r), 0);
+            if (dx * dx + dy * dy <= r * r) set(L, i, j, c);
+          }
+      };
+      const ellipse = (L, cx, cy, rx, ry, c) => {
+        for (let j = Math.floor(cy - ry); j <= cy + ry; j++)
+          for (let i = Math.floor(cx - rx); i <= cx + rx; i++) {
+            const dx = (i + 0.5 - cx) / rx, dy = (j + 0.5 - cy) / ry;
+            if (dx * dx + dy * dy <= 1) set(L, i, j, c);
+          }
+      };
+      const ring = (L, cx, cy, r, c) => {
+        for (let j = Math.floor(cy - r - 1); j <= cy + r + 1; j++)
+          for (let i = Math.floor(cx - r - 1); i <= cx + r + 1; i++) {
+            const d = Math.hypot(i + 0.5 - cx, j + 0.5 - cy);
+            if (d <= r && d > r - 1.15) set(L, i, j, c);
+          }
+      };
+      const outline = (L, c) => {
+        const add = [];
+        for (const k of L.keys()) {
+          const x = k % W, y = (k - x) / W;
+          for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nx = x + dx, ny = y + dy;
+            if (nx >= 0 && ny >= 0 && nx < W && ny < H && !L.has(ny * W + nx)) add.push(ny * W + nx);
+          }
+        }
+        add.forEach((k) => L.set(k, c));
+      };
+      const stamp = (L) => { for (const [k, c] of L) grid[Math.floor(k / W)][k % W] = c; };
+
+      // Wall with a small diamond dot pattern
+      const wall = layer();
+      rect(wall, 0, 0, W, H, C.wall);
+      for (let y = 3; y < 74; y += 6) for (let x = (y / 6) % 2 ? 6 : 3; x < W; x += 6) set(wall, x, y, C.wallDot);
+      stamp(wall);
+
+      // Window with a sunset and a cherry branch
+      const win = layer();
+      rect(win, 160, 8, 32, 40, C.sky1);
+      rect(win, 160, 22, 32, 13, C.sky2);
+      rect(win, 160, 35, 32, 13, C.sky3);
+      stamp(win);
+      const branch = layer();
+      for (let i = 0; i < 22; i++) set(branch, 191 - i, 12 + Math.floor(i * 0.55), C.branch);
+      for (let i = 0; i < 8; i++) set(branch, 181 - i, 18 - Math.floor(i * 0.6), C.branch);
+      stamp(branch);
+      const blossoms = layer();
+      [[186, 13], [178, 17], [172, 21], [175, 13], [183, 20], [170, 16]].forEach(([x, y]) => {
+        ellipse(blossoms, x, y, 2, 2, C.blossom);
+        set(blossoms, x - 1, y - 1, C.blossomHi);
+      });
+      stamp(blossoms);
+      const frame = layer();
+      rect(frame, 158, 6, 36, 2, C.s);
+      rect(frame, 158, 48, 36, 2, C.s);
+      rect(frame, 158, 6, 2, 44, C.s);
+      rect(frame, 192, 6, 2, 44, C.s);
+      rect(frame, 175, 8, 2, 40, C.s);
+      rect(frame, 160, 27, 32, 2, C.s);
+      stamp(frame);
+      const sill = layer();
+      rect(sill, 155, 50, 42, 3, C.woodTop);
+      outline(sill, C.ink);
+      stamp(sill);
+
+      // Wall clock
+      const clock = layer();
+      ellipse(clock, 134, 13, 8, 8, C.cream);
+      ring(clock, 134, 13, 8, C.s);
+      outline(clock, C.ink);
+      set(clock, 134, 6, C.ink); set(clock, 134, 20, C.ink); set(clock, 127, 13, C.ink); set(clock, 141, 13, C.ink);
+      rect(clock, 134, 8, 1, 5, C.ink);
+      rect(clock, 134, 13, 4, 1, C.red);
+      stamp(clock);
+
+      // Capi: head and body share one silhouette so the outline wraps both
+      const capi = layer();
+      roundRect(capi, 113, 50, 42, 30, 6, C.b);
+      ellipse(capi, 123, 29, 3.5, 3, C.d);
+      ellipse(capi, 145, 29, 3.5, 3, C.d);
+      roundRect(capi, 119, 28, 30, 27, 6, C.b);
+      outline(capi, C.k);
+      set(capi, 123, 28, C.s); set(capi, 124, 28, C.s); set(capi, 144, 28, C.s); set(capi, 145, 28, C.s);
+      roundRect(capi, 122, 30, 9, 3, 1, C.l);
+      rect(capi, 121, 55, 27, 1, C.d);
+      rect(capi, 152, 54, 2, 22, C.d);
+      rect(capi, 114, 56, 1, 20, C.l);
+      // Glasses: tinted lenses, rims, bridge and arms
+      ellipse(capi, 127, 40, 4.8, 4.8, C.l);
+      ellipse(capi, 141, 40, 4.8, 4.8, C.l);
+      ring(capi, 127, 40, 5, C.rim);
+      ring(capi, 141, 40, 5, C.rim);
+      rect(capi, 132, 39, 4, 1, C.rim);
+      rect(capi, 119, 38, 3, 1, C.rim);
+      rect(capi, 146, 38, 3, 1, C.rim);
+      set(capi, 124, 37, C.w); set(capi, 125, 36, C.w); set(capi, 138, 37, C.w); set(capi, 139, 36, C.w);
+      rect(capi, 126, 39, 2, 2, C.e);
+      rect(capi, 140, 39, 2, 2, C.e);
+      set(capi, 126, 39, C.w); set(capi, 140, 39, C.w);
+      // Nose, mouth, blush
+      roundRect(capi, 126, 45, 16, 8, 3, C.muzzle);
+      rect(capi, 130, 47, 2, 1, C.n);
+      rect(capi, 136, 47, 2, 1, C.n);
+      set(capi, 132, 50, C.n); set(capi, 135, 50, C.n); rect(capi, 133, 51, 2, 1, C.n);
+      rect(capi, 121, 46, 2, 1, C.p);
+      rect(capi, 146, 46, 2, 1, C.p);
+      stamp(capi);
+
+      // Desk
+      const desk = layer();
+      rect(desk, 0, 74, W, 4, C.woodTop);
+      rect(desk, 0, 74, W, 1, C.woodHi);
+      rect(desk, 0, 78, W, 1, C.woodEdge);
+      rect(desk, 0, 79, W, 26, C.wood);
+      for (const y of [87, 96]) for (let x = 0; x < W; x++) if ((x + y) % 23 < 15) set(desk, x, y, C.woodDark);
+      stamp(desk);
+
+      // Open book held up in front of Capi
+      const book = layer();
+      rect(book, 117, 66, 35, 11, C.red);
+      rect(book, 119, 65, 15, 10, C.page);
+      rect(book, 135, 65, 15, 10, C.page);
+      outline(book, C.ink);
+      rect(book, 134, 65, 1, 11, C.ink);
+      for (const y of [67, 69, 71, 73]) {
+        rect(book, 121, y, y === 73 ? 7 : 11, 1, C.line);
+        rect(book, 137, y, y === 67 ? 8 : 11, 1, C.line);
+      }
+      stamp(book);
+      const paws = layer();
+      ellipse(paws, 120, 66, 2.5, 2, C.d);
+      ellipse(paws, 149, 66, 2.5, 2, C.d);
+      outline(paws, C.k);
+      stamp(paws);
+
+      // Book stack with a little plant
+      [[158, 68, 30, C.red], [160, 63, 27, C.green], [159, 58, 28, C.mustard]].forEach(([x, y, w, c]) => {
+        const L = layer();
+        rect(L, x, y, w, 5, c);
+        outline(L, C.ink);
+        rect(L, x + w - 3, y + 1, 3, 3, C.page);
+        rect(L, x + 2, y + 2, 6, 1, C.cream);
+        stamp(L);
+      });
+      const plant = layer();
+      ellipse(plant, 168, 47, 4, 3, C.leaf);
+      ellipse(plant, 176, 45, 4, 3.5, C.leafDark);
+      ellipse(plant, 172, 42, 3, 4, C.leaf);
+      roundRect(plant, 167, 50, 11, 7, 1, C.pot);
+      outline(plant, C.ink);
+      rect(plant, 167, 50, 11, 1, C.ink);
+      rect(plant, 168, 51, 9, 1, C.red);
+      stamp(plant);
+
+      // Pencil cup
+      const pencils = layer();
+      [[101, 52, C.pencil], [104, 50, C.red], [107, 53, C.pencil]].forEach(([x, y, c]) => {
+        rect(pencils, x, y, 2, 12, c);
+        set(pencils, x, y - 1, C.page); set(pencils, x + 1, y - 1, C.page);
+        set(pencils, x, y - 2, C.tip);
+      });
+      outline(pencils, C.ink);
+      stamp(pencils);
+      const cup = layer();
+      roundRect(cup, 100, 61, 10, 13, 1, C.cream);
+      outline(cup, C.ink);
+      rect(cup, 100, 65, 10, 2, C.pot);
+      stamp(cup);
+
+      // Tea mug with steam
+      const mug = layer();
+      roundRect(mug, 84, 65, 10, 9, 1, C.green);
+      ring(mug, 95, 69, 3, C.green);
+      outline(mug, C.ink);
+      rect(mug, 85, 66, 8, 1, C.woodTop);
+      stamp(mug);
+      const steam = layer();
+      [[87, 62], [88, 61], [88, 60], [87, 59], [90, 61], [91, 60], [91, 59], [90, 58]].forEach(([x, y]) => set(steam, x, y, C.steam));
+      stamp(steam);
+
+      // Tomato timer, the app's Pomodoro
+      const TOMATO = [
+        '........kk........', '.......kgk........', '....kk.kgk.kk.....', '...kggkkggkgGk....', '..kkkgGGgGGggkk...',
+        '.kRRkkgGkgkkRRRk..', 'kRRrrRkkRkRRRRRRk.', 'kRwwrRRRRRRRRRRRRk', 'kRwrRRRRRRRRRRRRRk', 'kRwRRRRRRRRRRRRRRk',
+        'kRRRRRRRRRRRRRRRdk', 'kRRRRRRRRRRRRRRRdk', 'kRRRRRRRRRRRRRRddk', '.kRRRRRRRRRRRRRddk', '.kdRRRRRRRRRRRdddk',
+        '..kddRRRRRRRRdddk.', '...kkddddddddkk...', '.....kkkkkkkk.....',
+      ];
+      const TC = { k: '#3a1f1a', R: '#d8463a', r: '#f07d6c', w: '#fde3d8', d: '#a8302a', g: '#4c8a3c', G: '#6fb04f' };
+      const tomato = layer();
+      TOMATO.forEach((row, y) => [...row].forEach((ch, x) => TC[ch] && set(tomato, 60 + x, 56 + y, TC[ch])));
+      stamp(tomato);
+
+      const ctx = document.getElementById('c').getContext('2d');
+      for (let y = 0; y < H; y++)
+        for (let x = 0; x < W; x++) {
+          ctx.fillStyle = grid[y][x];
+          ctx.fillRect(x * S, y * S, S, S);
+        }
+    </script>
+  </body>
+</html>

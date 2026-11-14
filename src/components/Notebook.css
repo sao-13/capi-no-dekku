@@ -1,0 +1,119 @@
+/* The study area and the notebook share a row: the notebook is a real column, never on top of the card. */
+.with-notebook {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--s4);
+  align-items: start;
+}
+
+.with-notebook.is-open {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+}
+
+.notebook-tab {
+  position: sticky;
+  top: var(--s3);
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  padding: 14px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--muted);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  writing-mode: vertical-rl;
+  cursor: pointer;
+}
+
+.notebook-tab svg {
+  transform: rotate(90deg);
+  color: var(--accent-ink);
+}
+
+.notebook-tab:hover {
+  color: var(--text);
+  border-color: var(--control-border);
+}
+
+.notebook {
+  position: sticky;
+  top: var(--s3);
+  display: grid;
+  gap: 12px;
+  padding: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  animation: notebook-in 220ms var(--ease);
+}
+
+.notebook-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notebook-head h2 {
+  font-size: var(--fs-md);
+}
+
+.notebook-tip {
+  padding: 8px 12px;
+  border-left: 3px solid var(--highlight);
+  background: color-mix(in srgb, var(--highlight) 16%, transparent);
+  font-family: var(--font-cute);
+  font-size: var(--fs-sm);
+}
+
+/* Lined paper */
+.notebook-paper {
+  width: 100%;
+  min-height: 300px;
+  resize: vertical;
+  padding: 2px 12px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-sm);
+  background-color: var(--surface);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, var(--border) 27px 28px);
+  background-attachment: local;
+  color: var(--text);
+  font-family: var(--font-cute);
+  font-size: var(--fs-base);
+  line-height: 28px;
+}
+
+.notebook-paper:focus-visible {
+  outline-offset: 0;
+  border-color: var(--accent-ink);
+}
+
+@keyframes notebook-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@media (max-width: 960px) {
+  .with-notebook,
+  .with-notebook.is-open {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .notebook-tab {
+    position: static;
+    justify-self: start;
+    writing-mode: horizontal-tb;
+    padding: 8px 14px;
+  }
+
+  .notebook-tab svg {
+    transform: none;
+  }
+
+  .notebook {
+    position: static;
+  }
+}

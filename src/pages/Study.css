@@ -1,0 +1,434 @@
+.study {
+  display: grid;
+  margin-inline: auto;
+  width: 100%;
+  gap: var(--s3);
+  max-width: 720px;
+}
+
+.study-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.study-count {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.study-stage {
+  padding-top: var(--s3);
+  perspective: 1600px;
+}
+
+.study-stage:focus-visible {
+  outline: none;
+}
+
+/*
+  The index card: the one ornamented object in the app. A ruled card with a single
+  accent line under the header, like the red rule on a paper index card.
+*/
+
+.index-card-inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 200ms var(--ease);
+}
+
+.index-card.is-flipped .index-card-inner {
+  transform: rotateY(180deg);
+}
+
+.index-face {
+  grid-area: 1 / 1;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 336px; /* 56px header + seven 40px rules */
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background-color: var(--bg);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.06);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 39px,
+    color-mix(in srgb, var(--border) 70%, transparent) 39px,
+    color-mix(in srgb, var(--border) 70%, transparent) 40px
+  );
+  background-position: 0 56px;
+  background-repeat: no-repeat;
+  background-size: 100% calc(100% - 56px);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.index-back {
+  transform: rotateY(180deg);
+}
+
+.index-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s2);
+  height: 56px;
+  align-items: center;
+  padding: 0 var(--s3);
+  border-bottom: 1.5px solid var(--accent);
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.index-meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.index-prompt {
+  font-family: var(--font-serif);
+  font-size: var(--fs-sm);
+}
+
+/* Text sits on the card's 40px rules, like handwriting on a ruled card. */
+.index-text {
+  align-self: start;
+  padding: 40px var(--s5) 40px;
+  font-family: var(--font-serif);
+  font-size: clamp(var(--fs-lg), 3.4vw, var(--fs-xl));
+  font-weight: 500;
+  line-height: 40px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.index-answer {
+  font-size: clamp(var(--fs-md), 2.6vw, var(--fs-lg));
+  font-weight: 400;
+  text-wrap: pretty;
+}
+
+/* With reduced motion the card swaps faces without turning. */
+@media (prefers-reduced-motion: reduce) {
+  .index-card-inner {
+    transform: none !important;
+    transform-style: flat;
+  }
+
+  .index-face {
+    backface-visibility: visible;
+    transform: none;
+  }
+
+  .index-card:not(.is-flipped) .index-back,
+  .index-card.is-flipped .index-front {
+    visibility: hidden;
+  }
+}
+
+/* Controls */
+
+.study-controls {
+  min-height: 80px;
+}
+
+.study-controls:focus-visible {
+  outline: none;
+}
+
+.study-reveal {
+  width: 100%;
+  gap: 12px;
+}
+
+.study-answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+}
+
+.answer-btn {
+  display: grid;
+  gap: var(--s-half);
+  justify-items: start;
+  padding: 12px var(--s2);
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.answer-btn:hover {
+  background: var(--surface-raised);
+}
+
+.answer-btn.is-good {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+
+.answer-btn.is-good:hover {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface));
+}
+
+.answer-label {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  font-weight: 600;
+}
+
+.answer-hint {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+/* Session summary */
+
+.session-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s5);
+  margin: 0;
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.session-facts div {
+  display: grid;
+  gap: var(--s-half);
+}
+
+.session-facts dt {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.session-facts dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-xl);
+  line-height: 1.1;
+  font-variant-numeric: lining-nums;
+}
+
+.session-facts .session-next {
+  font-size: var(--fs-md);
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .index-text {
+    padding: 40px var(--s3);
+  }
+
+  .index-meta {
+    padding: 0 var(--s2);
+  }
+
+  .study-answers {
+    gap: var(--s1);
+  }
+
+  .session-facts {
+    gap: var(--s3);
+  }
+}
+
+/* Formatted and image cards */
+
+.index-card.has-image .index-face {
+  background-image: none;
+}
+
+.index-text .occl {
+  margin-top: var(--s1);
+}
+
+.index-extra {
+  margin-top: var(--s3);
+  font-size: var(--fs-md);
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.index-prompt {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Floating "+10 EXP" after each answer */
+.study {
+  position: relative;
+}
+
+.xp-float {
+  position: absolute;
+  right: 0;
+  top: 44px;
+  font-family: var(--font-cute);
+  font-size: var(--fs-md);
+  color: var(--accent-ink);
+  pointer-events: none;
+  animation: xp-rise 1100ms var(--ease) forwards;
+}
+
+@keyframes xp-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-22px);
+  }
+}
+
+/* Hints */
+.index-hint {
+  margin-top: 40px;
+  font-family: var(--font-cute);
+  font-size: var(--fs-md);
+  letter-spacing: 0.12em;
+  color: var(--accent-ink);
+}
+
+.hint-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-top: var(--s1);
+}
+
+.hint-btn {
+  color: var(--muted);
+}
+
+.keys-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-cute);
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+/* Gizmo Style choices */
+.mcq-options {
+  display: grid;
+  gap: var(--s1);
+  margin: 0 0 var(--s2);
+  padding: 0;
+  list-style: none;
+}
+
+.mcq-option {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  width: 100%;
+  padding: 12px var(--s2);
+  border: 1px solid var(--control-border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.mcq-option:hover:not(:disabled) {
+  background: var(--surface-raised);
+}
+
+.mcq-key {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.mcq-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mcq-option.is-answer {
+  border-color: var(--success);
+  background: var(--success-wash);
+}
+
+.mcq-option.is-answer .mcq-mark,
+.mcq-option.is-answer .mcq-key {
+  color: var(--success);
+  border-color: currentColor;
+}
+
+.mcq-option.is-wrong {
+  border-color: var(--danger);
+  background: var(--danger-wash);
+}
+
+.mcq-option.is-wrong .mcq-mark,
+.mcq-option.is-wrong .mcq-key {
+  color: var(--danger);
+  border-color: currentColor;
+}
+
+.mcq-option:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.mcq-option.is-out .mcq-text {
+  text-decoration: line-through;
+}
+
+.mcq-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.mcq-result {
+  font-weight: 600;
+}
+
+.mcq-result.is-right {
+  color: var(--success);
+}
+
+.mcq-result.is-wrong {
+  color: var(--danger);
+}

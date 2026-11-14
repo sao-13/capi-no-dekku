@@ -1,0 +1,264 @@
+.pomo {
+  position: relative;
+}
+
+.pomo-trigger.is-active {
+  color: var(--accent-ink);
+}
+
+/* Setup panel */
+
+.pomo-panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 40;
+  display: grid;
+  gap: 12px;
+  width: 260px;
+  padding: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+  animation: pomo-panel-in var(--dur) var(--ease);
+}
+
+.pomo-panel-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+
+.pomo-panel .segmented {
+  justify-self: start;
+}
+
+.pomo-custom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.pomo-custom .input {
+  width: 88px;
+  min-height: 36px;
+}
+
+@keyframes pomo-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* The floating timer. The positioner glides between the top and the middle of the screen. */
+
+.pomo-float {
+  position: fixed;
+  z-index: 60;
+  /* Centred over the page area, to the right of the sidebar. */
+  left: calc(50% + var(--sidebar-w) / 2);
+  top: var(--float-top);
+  transform: translate(-50%, 0);
+  transition:
+    top 650ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pomo-float.is-center {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.pomo-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  height: 44px;
+  padding: 0 6px 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.22);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.pomo-pill > svg {
+  color: var(--accent-ink);
+}
+
+.pomo-pill.is-break > svg {
+  color: var(--success);
+}
+
+.pomo-pill-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--accent);
+  transform-origin: left;
+  transition: transform 250ms linear;
+}
+
+.pomo-pill.is-break .pomo-pill-progress {
+  background: var(--success);
+}
+
+.pomo-pill-label {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.pomo-pill-time {
+  min-width: 4.5ch;
+  font-size: var(--fs-md);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pomo-pill-btn {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.pomo-pill-btn:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.pomo-pill.is-paused .pomo-pill-time {
+  color: var(--muted);
+}
+
+/* Last minute: the pill blinks red, on and off. */
+.pomo-pill.is-ending {
+  border-color: var(--danger);
+  animation: pomo-blink 1s steps(1, end) infinite;
+}
+
+.pomo-pill.is-ending > svg,
+.pomo-pill.is-ending .pomo-pill-time {
+  color: var(--danger);
+}
+
+@keyframes pomo-blink {
+  0% {
+    background: color-mix(in srgb, var(--danger) 30%, var(--surface-raised));
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--danger) 35%, transparent),
+      0 6px 20px rgb(0 0 0 / 0.22);
+  }
+  50% {
+    background: var(--surface-raised);
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.22);
+  }
+}
+
+/* Finished: a message card in the middle of the screen. */
+
+.pomo-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: var(--overlay);
+  animation: pomo-fade 400ms var(--ease);
+}
+
+.pomo-done {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  width: min(440px, calc(100vw - 32px));
+  padding: var(--s5) var(--s4) var(--s4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  text-align: center;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.3);
+  animation: pomo-grow 650ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pomo-done-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+.pomo-done-title {
+  font-size: var(--fs-xl);
+  font-family: var(--font-serif), 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+}
+
+.pomo-done-line {
+  max-width: 34ch;
+  color: var(--muted);
+}
+
+.pomo-done-actions {
+  justify-content: center;
+  margin-top: var(--s1);
+}
+
+@keyframes pomo-grow {
+  from {
+    transform: scale(0.55);
+    opacity: 0.4;
+  }
+}
+
+@keyframes pomo-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pomo-pill.is-ending {
+    animation: none;
+    background: color-mix(in srgb, var(--danger) 18%, var(--surface-raised));
+  }
+}
+
+@media (max-width: 760px) {
+  .pomo-panel {
+    position: fixed;
+    right: var(--s1);
+    top: calc(var(--topbar-h) + 8px);
+  }
+
+  .pomo-pill-label {
+    display: none;
+  }
+}
+
+/* In the sidebar the panel opens to the right of the button. */
+.pomo-panel.is-sidebar {
+  left: calc(100% + 12px);
+  right: auto;
+  top: auto;
+  bottom: 0;
+}
+
+.pomo-running {
+  color: var(--accent-ink);
+  font-size: var(--fs-xs);
+}

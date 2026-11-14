@@ -1,0 +1,96 @@
+.filedrop {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: var(--s1);
+  padding: var(--s4);
+  border: 1px dashed var(--control-border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+
+.filedrop.is-large {
+  min-height: 200px;
+}
+
+.filedrop.is-compact {
+  padding: var(--s2) var(--s3);
+}
+
+.filedrop:hover,
+.filedrop.is-dragging {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+
+.filedrop:focus-within {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+
+.filedrop svg {
+  color: var(--accent-ink);
+}
+
+.filedrop-title {
+  font-family: var(--font-serif);
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.filedrop.is-compact .filedrop-title {
+  font-size: var(--fs-base);
+}
+
+.filedrop-hint {
+  max-width: 60ch;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.filedrop.is-compact .filedrop-hint {
+  display: none;
+}
+
+.filedrop-list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filedrop-list li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: var(--s1) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.filedrop-list svg {
+  color: var(--accent-ink);
+}
+
+.filedrop-list .is-blocked {
+  color: var(--muted);
+}
+
+.filedrop-list .is-blocked svg {
+  color: var(--danger);
+}
+
+.filedrop-name {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.filedrop-size {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}

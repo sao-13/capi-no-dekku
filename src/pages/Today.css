@@ -1,0 +1,176 @@
+.home {
+  display: grid;
+  gap: var(--s4);
+  max-width: 980px;
+}
+
+.home-title {
+  font-size: var(--fs-md);
+  margin-bottom: 12px;
+}
+
+.home-start {
+  display: grid;
+  gap: 12px;
+}
+
+.home-start .home-title {
+  margin-bottom: 0;
+}
+
+.quick-deck {
+  display: flex;
+  gap: var(--s1);
+}
+
+.quick-deck .input {
+  flex: 1;
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+}
+
+.home-start .filedrop {
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+}
+
+/* Deck table + tomato */
+
+.home-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: var(--s4);
+  align-items: center;
+}
+
+.home-decks {
+  display: grid;
+  gap: var(--s1);
+}
+
+.home-decks-head {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.home-decks-head:not(:has(*:not(.visually-hidden))) {
+  display: none;
+}
+
+.home-empty {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
+.tomato {
+  display: grid;
+  justify-items: center;
+  gap: var(--s1);
+  padding: var(--s1);
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tomato-art {
+  position: relative;
+  display: block;
+  transition: transform 180ms var(--ease);
+}
+
+.tomato:hover .tomato-art {
+  transform: rotate(-4deg) translateY(-3px);
+}
+
+.tomato-glass {
+  position: absolute;
+  right: -14px;
+  bottom: 4px;
+}
+
+.tomato-note {
+  max-width: 15ch;
+  font-family: var(--font-cute);
+  font-size: var(--fs-md);
+  line-height: 1.25;
+  text-align: center;
+  text-shadow:
+    0 1px 0 var(--bg),
+    1px 0 0 var(--bg),
+    -1px 0 0 var(--bg),
+    0 -1px 0 var(--bg);
+}
+
+/* Activity */
+
+.home-activity {
+  position: relative;
+}
+
+.home-activity-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding-right: 190px;
+}
+
+.home-activity-head .home-title {
+  margin-bottom: var(--s2);
+}
+
+.home-bubble {
+  position: absolute;
+  right: -26px;
+  top: -36px;
+}
+
+a.section-aside {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+}
+
+a.section-aside:hover {
+  color: var(--text);
+}
+
+@media (max-width: 860px) {
+  .home {
+    gap: var(--s2);
+  }
+
+  .home-row {
+    grid-template-columns: 1fr;
+  }
+
+  .tomato {
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    justify-items: start;
+    gap: var(--s2);
+  }
+
+  .tomato-art svg {
+    width: 84px;
+    height: 84px;
+  }
+
+  .tomato-glass svg {
+    width: 24px;
+    height: auto;
+  }
+
+  .home-activity-head {
+    padding-right: 0;
+  }
+
+  .home-bubble {
+    position: static;
+    margin: 0 0 var(--s2);
+    transform: rotate(-2deg);
+  }
+
+  .quick-deck {
+    flex-direction: column;
+  }
+}

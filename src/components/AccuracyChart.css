@@ -1,0 +1,124 @@
+.chart {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  contain: inline-size;
+}
+
+.chart-frame {
+  position: relative;
+  border-radius: var(--r-sm);
+}
+
+.chart-frame svg {
+  overflow: visible;
+}
+
+.chart-grid {
+  stroke: var(--border);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.chart-tick {
+  fill: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chart-line {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart-dot {
+  fill: var(--accent);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+
+.chart-dot.is-active {
+  fill: var(--text);
+}
+
+.chart-crosshair {
+  stroke: var(--control-border);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.chart-end-label {
+  fill: var(--text);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.chart-tip {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, calc(-100% - 6px));
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface-raised);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-tip.align-right {
+  transform: translate(calc(-100% + 16px), calc(-100% - 6px));
+}
+
+.chart-tip.align-left {
+  transform: translate(-16px, calc(-100% - 6px));
+}
+
+/* Table twin */
+
+.chart-table-toggle summary {
+  width: fit-content;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chart-table-toggle summary:hover {
+  color: var(--text);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.data-table th {
+  font-weight: 500;
+  color: var(--muted);
+  font-size: var(--fs-xs);
+}
+
+.data-table td.num,
+.data-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin-top: var(--s2);
+}

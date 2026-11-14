@@ -1,0 +1,166 @@
+.zoom-bar {
+  position: sticky;
+  top: 41px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.zoom-bar .icon-btn {
+  width: 32px;
+  height: 32px;
+}
+
+.zoom-bar .icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.zoom-level {
+  min-width: 56px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.zoom-extra {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.view-loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: var(--s3);
+  color: var(--muted);
+}
+
+/* PDF pages sit on a grey desk like a real viewer */
+.pdf-pages {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  width: max-content;
+  min-width: 100%;
+  padding: var(--s2);
+}
+
+.pdf-page {
+  position: relative;
+  background: #fff;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.08),
+    0 2px 8px rgb(0 0 0 / 0.18);
+}
+
+.pdf-page canvas {
+  display: block;
+}
+
+/* pdf.js text layer: invisible text over the canvas so it can be selected */
+.pdf-page .textLayer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  transform-origin: 0 0;
+  z-index: 0;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.pdf-page .textLayer :is(span, br) {
+  position: absolute;
+  color: transparent;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.pdf-page .textLayer > :not(.markedContent),
+.pdf-page .textLayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.pdf-page .textLayer .markedContent {
+  display: contents;
+}
+
+.pdf-page .textLayer ::selection {
+  background: color-mix(in srgb, var(--highlight) 50%, transparent);
+  color: transparent;
+}
+
+.pdf-page .textLayer br::selection {
+  background: transparent;
+}
+
+.pdf-page .textLayer .endOfContent {
+  position: absolute;
+  inset: 100% 0 0;
+  display: block;
+  z-index: 0;
+  cursor: default;
+  user-select: none;
+}
+
+.pdf-page .textLayer.selecting .endOfContent {
+  top: 0;
+}
+
+/* Word documents */
+.docx-view {
+  width: max-content;
+  min-width: 100%;
+}
+
+.docx-view .docx-wrapper {
+  background: transparent !important;
+  padding: var(--s2) !important;
+}
+
+.docx-view .docx-wrapper > section.docx {
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.08),
+    0 2px 8px rgb(0 0 0 / 0.18) !important;
+  margin-bottom: var(--s2) !important;
+}
+
+.docx-view ::selection {
+  background: color-mix(in srgb, var(--highlight) 50%, transparent);
+}
+
+/* Images */
+.image-view {
+  display: grid;
+  justify-items: center;
+  width: max-content;
+  min-width: 100%;
+  padding: var(--s2);
+}
+
+.image-view img {
+  display: block;
+  max-width: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}

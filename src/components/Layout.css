@@ -1,0 +1,324 @@
+/*
+  Desktop: a cream sidebar with a dark rule, and the page floating over a pixel-art wallpaper.
+  Phones: a top bar and bottom tabs over the same wallpaper.
+*/
+
+:root {
+  --float-top: 20px;
+}
+
+body {
+  background: var(--sidebar);
+}
+
+.wordmark {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* Sidebar */
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s5);
+  width: var(--sidebar-w);
+  padding: var(--s5) var(--s2) var(--s4) var(--s3);
+  border-right: 2px solid var(--sidebar-line);
+  background: var(--sidebar);
+}
+
+.sidebar .wordmark {
+  padding-left: 4px;
+  font-size: 1.5rem;
+  white-space: normal;
+}
+
+.sidebar .wordmark-ja {
+  font-size: 0.6875rem;
+  white-space: nowrap;
+}
+
+/* The Japanese name rides beside the wordmark, a step smaller. */
+.wordmark-ja {
+  font-family: 'Zen Maru Gothic', var(--font-cute);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  vertical-align: 0.3em;
+}
+
+.sidebar .xp {
+  margin-top: calc(var(--s3) * -1);
+}
+
+.side-nav {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.side-link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 4px;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 1.1875rem;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color var(--dur) var(--ease);
+}
+
+.side-link:hover {
+  color: var(--accent-ink);
+}
+
+.side-link.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 2px var(--sidebar);
+}
+
+.side-link.active {
+  color: var(--text);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
+  text-decoration-color: var(--accent);
+}
+
+.side-foot {
+  display: grid;
+  gap: var(--s1);
+  margin-top: auto;
+}
+
+.side-foot .pomo-trigger {
+  font-size: var(--fs-base);
+}
+
+.side-foot .pomo-trigger svg {
+  color: var(--accent-ink);
+}
+
+.side-customize {
+  font-size: var(--fs-base);
+  font-weight: 600;
+}
+
+/* Stage: the wallpaper area */
+
+.stage {
+  position: relative;
+  min-height: 100dvh;
+  margin-left: var(--sidebar-w);
+}
+
+.stage::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 0 var(--sidebar-w);
+  z-index: -1;
+  background:
+    linear-gradient(var(--wallpaper-tint), var(--wallpaper-tint)),
+    var(--wallpaper, none) center / cover no-repeat,
+    var(--bg);
+}
+
+:root[data-sharp='on'] .stage::before {
+  image-rendering: pixelated;
+}
+
+.stage:focus {
+  outline: none;
+}
+
+.main-inner {
+  display: grid;
+  gap: var(--s3);
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--s5) var(--s5) var(--s8);
+}
+
+.stage.is-wide .main-inner {
+  max-width: none;
+  padding: var(--s3) var(--s3);
+}
+
+/* Most pages sit on one cream sheet over the wallpaper. */
+.sheet,
+.panel {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  backdrop-filter: blur(var(--panel-blur));
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.06);
+  --muted: var(--panel-muted);
+}
+
+.sheet {
+  padding: var(--s5) var(--s6) var(--s6);
+}
+
+.panel {
+  padding: var(--s3) var(--s4);
+}
+
+/* Phone chrome hidden on desktop */
+.topbar,
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --sidebar-w: 0px;
+    --float-top: calc(var(--topbar-h) + 12px);
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--topbar-h);
+    padding: 0 var(--s1) 0 var(--s2);
+    border-bottom: 2px solid var(--sidebar-line);
+    background: var(--sidebar);
+  }
+
+  .topbar .wordmark {
+    font-size: var(--fs-md);
+  }
+
+  .topbar .wordmark-ja {
+    font-size: 0.625rem;
+  }
+
+  @media (max-width: 380px) {
+    .topbar .xp {
+      display: none;
+    }
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .main-inner {
+    padding: var(--s2) var(--s1) calc(var(--s8) + 64px);
+  }
+
+  .stage.is-wide .main-inner {
+    padding: var(--s2) var(--s1) calc(64px + var(--s2));
+  }
+
+  .sheet {
+    padding: var(--s3) var(--s2) var(--s4);
+  }
+
+  .panel {
+    padding: var(--s2);
+  }
+
+  .tabbar {
+    position: fixed;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: block;
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 2px solid var(--sidebar-line);
+    background: var(--sidebar);
+  }
+
+  .tabbar ul {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tab-link {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 2px;
+    height: 62px; /* + 2px border = 64px, which sticky bars above it rely on */
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .tab-link.active {
+    color: var(--text);
+  }
+
+  .tab-link.active svg {
+    color: var(--accent-ink);
+  }
+
+  .tab-link:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .toast-region {
+    right: var(--s2);
+    bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+}
+
+/* While studying or quizzing, the wallpaper dims and softens so nothing competes with the card. */
+.stage.is-focus::before {
+  filter: brightness(0.9) saturate(0.8);
+}
+
+:root[data-theme='dark'] .stage.is-focus::before,
+:root[data-theme='midnight'] .stage.is-focus::before {
+  filter: brightness(0.75) saturate(0.75);
+}
+
+/* Nothing to dim on plain paper (Plain wallpaper or No fluff mode). */
+:root[data-wallpaper='none'] .stage.is-focus::before,
+:root[data-fluff='off'] .stage.is-focus::before {
+  filter: none;
+}

@@ -1,0 +1,189 @@
+/*
+  Design tokens. Every color, size and duration in the app comes from here.
+  Contrast notes (WCAG): text and muted text clear 4.5:1 on both bg and surface;
+  --accent-ink is the text-safe version of the accent; --control-border clears 3:1
+  so inputs and buttons are identifiable without relying on fill.
+*/
+
+:root {
+  /* Type */
+  --font-serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Scale: major third (1.25) from 16px */
+  --fs-xs: 0.8125rem; /* 13 */
+  --fs-sm: 0.875rem; /* 14 */
+  --fs-base: 1rem; /* 16 */
+  --fs-md: 1.25rem; /* 20 */
+  --fs-lg: 1.5625rem; /* 25 */
+  --fs-xl: 1.9375rem; /* 31 */
+  --fs-2xl: 2.4375rem; /* 39 */
+  --fs-3xl: 3.0625rem; /* 49 */
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.35;
+  --lh-body: 1.6;
+  --lh-serif: 1.65;
+
+  /* 8px grid */
+  --s-half: 4px;
+  --s1: 8px;
+  --s2: 16px;
+  --s3: 24px;
+  --s4: 32px;
+  --s5: 40px;
+  --s6: 48px;
+  --s8: 64px;
+  --s10: 80px;
+
+  --r-sm: 6px;
+  --r-md: 8px;
+
+  --measure: 68ch;
+  --topbar-h: 56px;
+  --sidebar-w: 244px;
+  --content-max: 1240px;
+  --font-cute: 'DotGothic16', 'Pixelify Sans', var(--font-sans);
+
+  --dur: 180ms;
+  --ease: ease;
+
+  /*
+    Panel see-through (Customizations slider). --panel-t runs -1 (glass) to 0 (the theme's
+    --panel-base) to 1 (solid). Lower opacity gets more blur so text keeps a calm backdrop.
+  */
+  --panel-t: 0;
+  --panel-alpha: calc(
+    var(--panel-base) + max(var(--panel-t), 0) * (100% - var(--panel-base)) + min(var(--panel-t), 0) * (var(--panel-base) - 25%)
+  );
+  --panel: color-mix(in srgb, var(--surface) var(--panel-alpha), transparent);
+  --panel-blur: calc(3px - min(var(--panel-t), 0) * 9px);
+  /* Muted text on panels moves toward full text colour as panels get clearer, so it stays legible over wallpaper. */
+  --panel-muted: color-mix(in srgb, var(--text) calc(max(var(--panel-t) * -100%, 0%)), var(--muted));
+}
+
+/* Dark is the primary theme */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #1f1b16;
+  --surface: #2a251f;
+  --surface-raised: #332d26;
+  --border: #3a342c;
+  --control-border: #7d7366;
+  --text: #f2ebdd;
+  --muted: #a89f91;
+  --accent: #c8694a;
+  --accent-ink: #d98466;
+  --on-accent: #1f1b16;
+  --accent-wash: color-mix(in srgb, var(--accent) 14%, var(--surface));
+  --success: #a3b67f;
+  --success-wash: color-mix(in srgb, var(--success) 14%, var(--surface));
+  --danger: #ec8f86;
+  --danger-wash: color-mix(in srgb, var(--danger) 14%, var(--surface));
+  --overlay: rgb(15 12 9 / 0.66);
+  --highlight: #d9b44a;
+  --sidebar: #191612;
+  --sidebar-line: #4a4238;
+  --panel-base: 90%;
+  --wallpaper-tint: rgb(12 10 8 / 0.45);
+  --count-new: #93b6ea;
+  --count-learn: #ec8f86;
+  --count-due: #a9c084;
+  /* Activity grid: one hue, validated as an ordinal ramp against --bg (light end >= 2:1). */
+  --heat-0: #2e2923;
+  --heat-1: #6e4532;
+  --heat-2: #93543a;
+  --heat-3: #bf6a48;
+  --heat-4: #ec9a76;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f1ecdf;
+  --surface: #e9e3d2;
+  --surface-raised: #ddd5bf;
+  --border: #c9bfa6;
+  --control-border: #8a7f70;
+  --text: #2b2620;
+  --muted: #625a4f;
+  --accent: #a9553a;
+  --accent-ink: #8f442b;
+  --on-accent: #fbf8f2;
+  --accent-wash: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --success: #415f26;
+  --success-wash: color-mix(in srgb, var(--success) 10%, var(--surface));
+  --danger: #9e342c;
+  --danger-wash: color-mix(in srgb, var(--danger) 9%, var(--surface));
+  --overlay: rgb(43 38 32 / 0.4);
+  --highlight: #e3b93c;
+  --sidebar: #e9e5d6;
+  --sidebar-line: #2b2620;
+  --panel-base: 90%;
+  --wallpaper-tint: transparent;
+  /* Anki-style counts, darkened to clear 4.5:1 on panels */
+  --count-new: #2e548d;
+  --count-learn: #963927;
+  --count-due: #3f5f25;
+  --heat-0: #ddd4c0;
+  --heat-1: #d8967a;
+  --heat-2: #c27352;
+  --heat-3: #a2512f;
+  --heat-4: #73341b;
+}
+
+/* Font sets (Customizations > Fonts) */
+:root[data-font='pixel'] {
+  --font-serif: 'DotGothic16', 'Pixelify Sans', monospace;
+  --font-sans: 'DotGothic16', 'Pixelify Sans', monospace;
+}
+
+:root[data-font='arcade'] {
+  --font-serif: 'Pixelify Sans', 'DotGothic16', monospace;
+}
+
+:root[data-font='soft'] {
+  --font-serif: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+  --font-sans: 'Zen Maru Gothic', 'Hiragino Maru Gothic ProN', sans-serif;
+}
+
+/* Midnight: darker and warmer than Dark, for late nights. The wallpaper is dimmed well down. */
+:root[data-theme='midnight'] {
+  color-scheme: dark;
+  --bg: #0d0b09;
+  --surface: #15120f;
+  --surface-raised: #1d1915;
+  --border: #2a251f;
+  --control-border: #6e665b;
+  --text: #e6dccb;
+  --muted: #9b9182;
+  --accent: #c26a4a;
+  --accent-ink: #cf7f60;
+  --on-accent: #0d0b09;
+  --accent-wash: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --success: #a3b67f;
+  --success-wash: color-mix(in srgb, var(--success) 10%, var(--surface));
+  --danger: #e0877d;
+  --danger-wash: color-mix(in srgb, var(--danger) 10%, var(--surface));
+  --overlay: rgb(0 0 0 / 0.72);
+  --highlight: #b8963e;
+  --sidebar: #0a0807;
+  --sidebar-line: #2e2822;
+  --panel-base: 95%;
+  --wallpaper-tint: rgb(5 4 3 / 0.74);
+  --count-new: #8fb0e0;
+  --count-learn: #e0877d;
+  --count-due: #a5bb82;
+  --heat-0: #1c1814;
+  --heat-1: #4a3022;
+  --heat-2: #6e4430;
+  --heat-3: #94583c;
+  --heat-4: #c2785a;
+}
+
+/* Plain fonts for No fluff mode */
+:root[data-font='plain'] {
+  --font-serif: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-cute: 'IBM Plex Sans', system-ui, sans-serif;
+}

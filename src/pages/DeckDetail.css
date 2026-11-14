@@ -1,0 +1,180 @@
+.deck-head {
+  gap: var(--s2);
+}
+
+.deck-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.deck-title-row h1 {
+  max-width: 22ch;
+}
+
+.deck-admin {
+  margin-top: 6px;
+}
+
+.deck-admin .btn {
+  color: var(--muted);
+}
+
+.deck-admin .btn:hover {
+  color: var(--text);
+}
+
+.deck-admin .btn-danger:hover {
+  color: var(--danger);
+}
+
+.deck-summary {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.deck-actions {
+  margin-top: var(--s1);
+}
+
+/* Add card */
+
+.add-card,
+.card-edit {
+  display: grid;
+  gap: var(--s2);
+}
+
+.add-card-sides {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+}
+
+.add-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s2);
+}
+
+/* Card list: front in serif, back in sans, like a two-column glossary */
+
+.card-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) auto;
+  align-items: start;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-row.is-editing {
+  display: block;
+  padding: var(--s2);
+  margin: var(--s1) calc(var(--s2) * -1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface);
+}
+
+.card-front {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: var(--lh-snug);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.card-back {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: -8px;
+}
+
+.card-meta .tag {
+  margin-right: var(--s1);
+}
+
+.card-meta .icon-btn {
+  width: 36px;
+  height: 36px;
+}
+
+@media (max-width: 760px) {
+  .add-card-sides {
+    grid-template-columns: 1fr;
+  }
+
+  .card-row {
+    grid-template-columns: 1fr auto;
+    gap: var(--s-half) var(--s2);
+  }
+
+  .card-front {
+    grid-column: 1;
+  }
+
+  .card-back {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .card-meta {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .card-meta .tag {
+    margin: 0 0 var(--s-half);
+  }
+}
+
+/* Gizmo Style summary: the right answer marked, the wrong ones muted */
+.mcq-summary {
+  display: grid;
+  gap: 2px;
+}
+
+.mcq-right::before,
+.mcq-wrong-item::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  vertical-align: 1px;
+}
+
+.mcq-right {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.mcq-right::before {
+  background: var(--success);
+}
+
+.mcq-wrong-item::before {
+  background: var(--danger);
+  opacity: 0.7;
+}

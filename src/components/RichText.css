@@ -1,0 +1,49 @@
+.rt {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.rt u {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.rt-mark {
+  padding: 0 0.12em;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--highlight) 40%, transparent);
+  color: inherit;
+}
+
+.rt-math .katex {
+  font-size: 1.05em;
+}
+
+.rt-math-display {
+  display: block;
+  margin: 0.4em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.rt-blank {
+  display: inline-block;
+  min-width: 3ch;
+  padding: 0 0.3em;
+  border-bottom: 2px solid var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-align: center;
+}
+
+.rt-reveal {
+  padding: 0 0.15em;
+  border-radius: 2px;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.rt-cloze {
+  border-bottom: 1px dashed var(--control-border);
+}

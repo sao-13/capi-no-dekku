@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Capi’s Deck is a quiet place to make flashcards, review them on a schedule, and see how your studying adds up." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>Capi’s Deck</title>
+    <!-- Share preview. Most sites need an absolute URL here: swap in the full domain once deployed. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Capi’s Deck" />
+    <meta property="og:description" content="Make flashcards, review them on a schedule, and study alongside Capi the capybara." />
+    <meta property="og:image" content="/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Capi the pixel capybara, wearing round glasses, reading a book at a wooden desk." />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Apply saved look-and-feel before first paint so there is no flash (see src/lib/settings.ts).
+      (function () {
+        var root = document.documentElement;
+        var s = { theme: 'light', font: 'storybook', wallpaper: 'cottage', doodles: true, noFluff: false };
+        try {
+          var saved = JSON.parse(localStorage.getItem('margin:settings') || 'null');
+          if (saved) for (var k in saved) s[k] = saved[k];
+          else {
+            var old = localStorage.getItem('margin:theme');
+            if (old === 'light' || old === 'dark') s.theme = old;
+          }
+        } catch (e) {}
+        root.dataset.theme = s.theme === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : s.theme;
+        if (s.noFluff) { s.font = 'plain'; s.wallpaper = 'none'; s.doodles = false; }
+        root.dataset.font = s.font;
+        root.dataset.wallpaper = s.wallpaper;
+        root.dataset.doodles = s.doodles ? 'on' : 'off';
+        root.dataset.fluff = s.noFluff ? 'off' : 'on';
+        if (typeof s.panelOpacity === 'number') root.style.setProperty('--panel-t', String((s.panelOpacity - 50) / 50));
+        if (s.wallpaper !== 'custom' && s.wallpaper !== 'none') {
+          root.style.setProperty('--wallpaper', 'url("/wallpapers/' + s.wallpaper + '.png")');
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

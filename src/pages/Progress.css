@@ -1,0 +1,102 @@
+.progress-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.progress-facts > div {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+  padding: var(--s3) var(--s3) var(--s3) 0;
+}
+
+.progress-facts > div + div {
+  padding-left: var(--s3);
+  border-left: 1px solid var(--border);
+}
+
+.progress-facts dt {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+.progress-facts dd {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.fact-of {
+  font-size: var(--fs-md);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.fact-note {
+  font-size: var(--fs-xs);
+  color: var(--muted);
+}
+
+.chart-caption {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+/* Per-deck table */
+
+.progress-deck-table th[scope='row'] {
+  font-weight: 400;
+}
+
+.progress-deck-name {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.progress-deck-name:hover {
+  text-decoration: underline;
+}
+
+.mastery {
+  display: grid;
+  grid-template-columns: minmax(72px, 120px) auto;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.progress-deck-table {
+  min-width: 560px;
+}
+
+@media (max-width: 760px) {
+  .progress-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .progress-facts > div:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .progress-facts > div:nth-child(n + 3) {
+    border-top: 1px solid var(--border);
+  }
+
+  .progress-facts dd {
+    font-size: var(--fs-xl);
+  }
+
+  .section-head:has(.segmented) {
+    flex-wrap: wrap;
+  }
+}

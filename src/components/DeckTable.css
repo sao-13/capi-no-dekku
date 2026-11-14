@@ -1,0 +1,102 @@
+.deck-table-wrap {
+  overflow-x: auto;
+}
+
+.deck-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+
+.deck-table thead th {
+  padding: 0 12px 10px;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.deck-table td,
+.deck-table tbody th {
+  padding: 7px 12px;
+  text-align: left;
+  font-weight: 400;
+}
+
+.deck-table .num {
+  width: 64px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.deck-table tbody tr {
+  transition: background-color var(--dur) var(--ease);
+}
+
+.deck-table tbody tr:hover {
+  background: var(--surface-raised);
+}
+
+.deck-table tbody tr > :first-child {
+  border-radius: var(--r-sm) 0 0 var(--r-sm);
+}
+
+.deck-table tbody tr > :last-child {
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+}
+
+.deck-table tbody th {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.deck-table-name {
+  color: var(--text);
+  text-decoration: none;
+}
+
+.deck-table-name:hover {
+  text-decoration: underline;
+}
+
+.count-new {
+  color: var(--count-new);
+}
+
+.count-learn {
+  color: var(--count-learn);
+}
+
+.count-due {
+  color: var(--count-due);
+}
+
+.deck-table .is-zero {
+  color: var(--muted);
+  opacity: 0.6;
+}
+
+.deck-table-when {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.deck-table-gear {
+  width: 44px;
+  padding: 0 4px !important;
+}
+
+.deck-table-gear .icon-btn {
+  width: 32px;
+  height: 32px;
+  opacity: 0.55;
+}
+
+.deck-table tr:hover .deck-table-gear .icon-btn,
+.deck-table-gear .icon-btn:focus-visible {
+  opacity: 1;
+}
+
+.deck-table-empty {
+  padding: var(--s1) 0;
+}

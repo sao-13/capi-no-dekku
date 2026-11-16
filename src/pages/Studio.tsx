@@ -560,7 +560,7 @@ export function Studio() {
               {draft.type === 'cloze' ? 'Text' : 'Front'} <kbd>F</kbd>
             </button>
             <button type="button" onClick={() => send('back')} title="Send to back (B)">
-              {draft.type === 'basic' || draft.type === 'reversed' ? 'Back' : draft.type === 'mcq' ? 'Answer' : 'Extra'} <kbd>B</kbd>
+              {draft.type === 'basic' || draft.type === 'reversed' ? 'Back' : draft.type === 'mcq' || draft.type === 'typein' ? 'Answer' : 'Extra'} <kbd>B</kbd>
             </button>
             <button type="button" onClick={() => send('cloze')} title="Add as a cloze deletion (C)">
               <Brackets size={14} aria-hidden="true" /> Cloze <kbd>C</kbd>

@@ -56,7 +56,7 @@ export function Customize() {
         <div>
           <h2 id="nofluff-heading">No fluff mode</h2>
           <p className="muted">
-            For serious studying: no wallpaper, no Capi, no pop-ups, EXP, keys or sounds, plain fonts and plain cards.
+            For serious studying: no wallpaper, no Capi, no pop-ups, EXP or sounds, plain fonts and plain cards.
             Hints become free, and study shows your first-try accuracy as you go. Your other choices are kept for when
             you turn it off.
           </p>

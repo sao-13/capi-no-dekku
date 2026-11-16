@@ -14,7 +14,8 @@
   gap: 12px;
 }
 
-.home-start .home-title {
+.home-start .home-title,
+.home-decks .home-title {
   margin-bottom: 0;
 }
 
@@ -43,16 +44,7 @@
 
 .home-decks {
   display: grid;
-  gap: var(--s1);
-}
-
-.home-decks-head {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.home-decks-head:not(:has(*:not(.visually-hidden))) {
-  display: none;
+  gap: 12px;
 }
 
 .home-empty {

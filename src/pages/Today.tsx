@@ -1,9 +1,9 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, Play, Plus } from 'lucide-react';
+import { BookOpen, Plus } from 'lucide-react';
 import { FileDrop } from '../components/FileDrop';
 import { Heatmap } from '../components/Heatmap';
-import { DeckTable, deckCounts } from '../components/DeckTable';
+import { DeckTable } from '../components/DeckTable';
 import { Hourglass, SpeechBubble, Tomato } from '../components/Doodles';
 import { openTimerPanel } from '../components/Pomodoro';
 import { formatLongDate, todayKey } from '../lib/dates';
@@ -29,7 +29,6 @@ export function Today() {
   const streak = streakInfo(activity, today);
   const [deckName, setDeckName] = useState('');
   const [deckError, setDeckError] = useState<string | null>(null);
-  const waiting = useMemo(() => deckCounts(data, today).reduce((n, d) => n + d.learn + d.due, 0), [data, today]);
 
   function makeDeck(e: FormEvent) {
     e.preventDefault();
@@ -46,7 +45,7 @@ export function Today() {
 
       <section className="panel home-start" aria-labelledby="start-heading">
         <h2 id="start-heading" className="home-title">
-          Start a deck
+          Create a deck
         </h2>
         <form className="quick-deck" onSubmit={makeDeck} noValidate>
           <label className="visually-hidden" htmlFor="quick-deck-name">
@@ -79,17 +78,9 @@ export function Today() {
 
       <div className="home-row">
         <section className="panel home-decks" aria-labelledby="decks-heading">
-          <div className="home-decks-head">
-            <h2 id="decks-heading" className="visually-hidden">
-              Your decks
-            </h2>
-            {waiting > 0 && (
-              <Link to="/study" className="btn btn-primary btn-sm">
-                <Play size={14} aria-hidden="true" />
-                Review all {waiting}
-              </Link>
-            )}
-          </div>
+          <h2 id="decks-heading" className="home-title">
+            Review your decks
+          </h2>
           {data.decks.length ? (
             <DeckTable />
           ) : (

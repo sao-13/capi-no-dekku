@@ -67,6 +67,10 @@ export function validateDraft(d: CardDraft): string | null {
       if (new Set(all).size < 4) return 'Each choice needs to be different.';
       return null;
     }
+    case 'typein':
+      if (!d.front.trim()) return 'Write the question.';
+      if (!d.back.trim()) return 'Write the answer to type.';
+      return null;
     case 'occlusion':
       if (!d.image) return 'Choose an image to hide parts of.';
       if (!d.masks.length) return 'Draw at least one box over the part to hide.';

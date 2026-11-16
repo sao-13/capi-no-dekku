@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, FolderOpen, Heart, Infinity as InfinityIcon, KeyRound, ListChecks, Play, RotateCcw, X } from 'lucide-react';
+import { ArrowLeft, Check, FolderOpen, Lightbulb, ListChecks, Play, RotateCcw, X } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
 import { recordQuiz, useData } from '../lib/store';
 import { buildQuiz, canQuiz, shuffle, type Question } from '../lib/quiz';
 import { plural } from '../lib/dates';
 import type { Card } from '../lib/types';
 import { RichText } from '../components/RichText';
-import { Notebook, useNotebookOpen } from '../components/Notebook';
-import '../components/Notebook.css';
-import { spendKey, useKeys } from '../lib/keys';
-import { plainText } from '../lib/markup';
+import { SessionBar } from '../components/SessionBar';
+import { StickyNotes } from '../components/StickyNotes';
+import { setNotesOpen, useCardNote, useNotesOpen } from '../lib/notes';
 import { useSessionCheers } from '../lib/useSessionCheers';
 import { clozeAnswer, clozeNumbers, clozeQuestion } from '../lib/markup';
 import { typeOf } from '../lib/srs';
@@ -51,8 +50,7 @@ export function Quiz() {
   const [answers, setAnswers] = useState<Answer[]>([]);
   const nextRef = useRef<HTMLButtonElement>(null);
   const cheers = useSessionCheers();
-  const keys = useKeys();
-  const [notebookOpen, setNotebookOpen] = useNotebookOpen();
+  const notesOpen = useNotesOpen();
   const questionRef = useRef<HTMLHeadingElement>(null);
 
   const start = useCallback(
@@ -70,6 +68,7 @@ export function Quiz() {
   );
 
   const question = questions[index];
+  const currentNote = useCardNote(question?.card.id ?? '');
 
   const choose = useCallback(
     (option: number) => {
@@ -86,7 +85,6 @@ export function Quiz() {
     if (!question || chosen !== null) return;
     const wrong = question.options.map((_, i) => i).filter((i) => i !== question.answerIndex && !ruledOut.has(i));
     if (wrong.length <= 1) return;
-    if (!spendKey()) return;
     setRuledOut((r) => new Set(r).add(shuffle(wrong)[0]));
   }, [question, chosen, ruledOut]);
 
@@ -125,39 +123,43 @@ export function Quiz() {
 
   if (!deck) {
     return (
-      <div className="page">
-        <EmptyState
-          icon={FolderOpen}
-          title="This deck isn't here anymore"
-          headingLevel="h1"
-          actions={
-            <Link to="/decks" className="btn">
-              See all decks
-            </Link>
-          }
-        >
-          It may have been deleted. Pick another deck to quiz yourself on.
-        </EmptyState>
+      <div className="sheet">
+        <div className="page">
+          <EmptyState
+            icon={FolderOpen}
+            title="This deck isn't here anymore"
+            headingLevel="h1"
+            actions={
+              <Link to="/decks" className="btn">
+                See all decks
+              </Link>
+            }
+          >
+            It may have been deleted. Pick another deck to quiz yourself on.
+          </EmptyState>
+        </div>
       </div>
     );
   }
 
   if (!canQuiz(cards, otherBacks)) {
     return (
-      <div className="page">
-        <EmptyState
-          icon={ListChecks}
-          title="A quiz needs at least two cards"
-          headingLevel="h1"
-          actions={
-            <Link to={`/decks/${deck.id}`} className="btn btn-primary">
-              Add cards to {deck.name}
-            </Link>
-          }
-        >
-          Each question offers other cards' answers as the wrong choices, so there has to be more than one answer to
-          choose from. {cards.length === 1 ? 'This deck has one card.' : "This deck doesn't have any cards yet."}
-        </EmptyState>
+      <div className="sheet">
+        <div className="page">
+          <EmptyState
+            icon={ListChecks}
+            title="A quiz needs at least two cards"
+            headingLevel="h1"
+            actions={
+              <Link to={`/decks/${deck.id}`} className="btn btn-primary">
+                Add cards to {deck.name}
+              </Link>
+            }
+          >
+            Each question offers other cards' answers as the wrong choices, so there has to be more than one answer to
+            choose from. {cards.length === 1 ? 'This deck has one card.' : "This deck doesn't have any cards yet."}
+          </EmptyState>
+        </div>
       </div>
     );
   }
@@ -165,46 +167,48 @@ export function Quiz() {
   const back = (
     <Link to={`/decks/${deck.id}`} className="breadcrumb">
       <ArrowLeft size={16} aria-hidden="true" />
-      {phase === 'asking' ? 'Leave quiz' : deck.name}
+      {deck.name}
     </Link>
   );
 
   if (phase === 'setup') {
     const lengths = [...new Set([5, 10, 20].filter((n) => n < cards.length).concat(cards.length))];
     return (
-      <div className="page quiz">
-        <header className="page-head">
-          {back}
-          <h1>Quiz on {deck.name}</h1>
-          <p className="page-lede">
-            Pick the right answer for each card. Hearts never run out. Hints rule out a wrong answer and cost one key each.
-          </p>
-        </header>
-        <form
-          className="quiz-setup"
-          onSubmit={(e) => {
-            e.preventDefault();
-            start(cards, length);
-          }}
-        >
-          <fieldset className="choice-group">
-            <legend className="field-label">How many questions?</legend>
-            <div className="choice-row">
-              {lengths.map((n) => (
-                <label key={n} className="choice">
-                  <input type="radio" name="length" value={n} checked={length === n} onChange={() => setLength(n)} />
-                  <span>{n === cards.length ? `All ${n}` : n}</span>
-                </label>
-              ))}
+      <div className="sheet">
+        <div className="page quiz">
+          <header className="page-head">
+            {back}
+            <h1>Quiz on {deck.name}</h1>
+            <p className="page-lede">
+              Pick the right answer for each card. Hearts never run out. Hints rule out a wrong answer.
+            </p>
+          </header>
+          <form
+            className="quiz-setup"
+            onSubmit={(e) => {
+              e.preventDefault();
+              start(cards, length);
+            }}
+          >
+            <fieldset className="choice-group">
+              <legend className="field-label">How many questions?</legend>
+              <div className="choice-row">
+                {lengths.map((n) => (
+                  <label key={n} className="choice">
+                    <input type="radio" name="length" value={n} checked={length === n} onChange={() => setLength(n)} />
+                    <span>{n === cards.length ? `All ${n}` : n}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <div>
+              <button type="submit" className="btn btn-primary btn-lg">
+                <Play size={16} aria-hidden="true" />
+                Start quiz
+              </button>
             </div>
-          </fieldset>
-          <div>
-            <button type="submit" className="btn btn-primary btn-lg">
-              <Play size={16} aria-hidden="true" />
-              Start quiz
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     );
   }
@@ -214,75 +218,77 @@ export function Quiz() {
     const missed = answers.filter((a) => !a.correct);
     const pct = Math.round((right / answers.length) * 100);
     return (
-      <div className="page quiz">
-        <header className="page-head">
-          {back}
-          <h1>
-            {right} of {answers.length} right
-          </h1>
-          <p className="page-lede">
-            {missed.length === 0
-              ? `A clean sheet: every answer right on ${deck.name}.`
-              : `${pct}% on this run. The ${missed.length === 1 ? 'one you missed is' : `${missed.length} you missed are`} listed below with the right answer.`}
-          </p>
-        </header>
+      <div className="sheet">
+        <div className="page quiz">
+          <header className="page-head">
+            {back}
+            <h1>
+              {right} of {answers.length} right
+            </h1>
+            <p className="page-lede">
+              {missed.length === 0
+                ? `A clean sheet: every answer right on ${deck.name}.`
+                : `${pct}% on this run. The ${missed.length === 1 ? 'one you missed is' : `${missed.length} you missed are`} listed below with the right answer.`}
+            </p>
+          </header>
 
-        <div className="score-bar" aria-hidden="true">
-          {answers.map((a, i) => (
-            <span key={i} className={a.correct ? 'is-right' : 'is-wrong'} />
-          ))}
-        </div>
+          <div className="score-bar" aria-hidden="true">
+            {answers.map((a, i) => (
+              <span key={i} className={a.correct ? 'is-right' : 'is-wrong'} />
+            ))}
+          </div>
 
-        <div className="btn-row">
-          {missed.length > 0 && (
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => start(
-                missed.map((m) => m.question.card),
-                missed.length,
-              )}
-            >
-              <RotateCcw size={16} aria-hidden="true" />
-              Retry the {missed.length === 1 ? 'one' : missed.length} you missed
+          <div className="btn-row">
+            {missed.length > 0 && (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => start(
+                  missed.map((m) => m.question.card),
+                  missed.length,
+                )}
+              >
+                <RotateCcw size={16} aria-hidden="true" />
+                Retry the {missed.length === 1 ? 'one' : missed.length} you missed
+              </button>
+            )}
+            <button type="button" className={`btn${missed.length ? '' : ' btn-primary'}`} onClick={() => start(cards, length)}>
+              New quiz
             </button>
-          )}
-          <button type="button" className={`btn${missed.length ? '' : ' btn-primary'}`} onClick={() => start(cards, length)}>
-            New quiz
-          </button>
-          <Link to={`/decks/${deck.id}/study`} className="btn">
-            Study {deck.name}
-          </Link>
-        </div>
+            <Link to={`/decks/${deck.id}/study`} className="btn">
+              Study {deck.name}
+            </Link>
+          </div>
 
-        {missed.length > 0 && (
-          <section className="section" aria-labelledby="missed-heading">
-            <div className="section-head">
-              <h2 id="missed-heading">To go over</h2>
-            </div>
-            <ul className="missed-list">
-              {missed.map((m) => (
-                <li key={m.question.card.id}>
-                  <RichText as="p" className="missed-q" text={m.question.card.front} />
-                  <p className="missed-right">
-                    <Check size={16} aria-hidden="true" />
-                    <span>
-                      <span className="visually-hidden">Right answer: </span>
-                      <RichText text={m.question.card.back} />
-                    </span>
-                  </p>
-                  <p className="missed-yours">
-                    <X size={16} aria-hidden="true" />
-                    <span>
-                      <span className="visually-hidden">You chose: </span>
-                      <RichText text={m.question.options[m.chosen]} />
-                    </span>
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          {missed.length > 0 && (
+            <section className="section" aria-labelledby="missed-heading">
+              <div className="section-head">
+                <h2 id="missed-heading">To go over</h2>
+              </div>
+              <ul className="missed-list">
+                {missed.map((m) => (
+                  <li key={m.question.card.id}>
+                    <RichText as="p" className="missed-q" text={m.question.card.front} />
+                    <p className="missed-right">
+                      <Check size={16} aria-hidden="true" />
+                      <span>
+                        <span className="visually-hidden">Right answer: </span>
+                        <RichText text={m.question.card.back} />
+                      </span>
+                    </p>
+                    <p className="missed-yours">
+                      <X size={16} aria-hidden="true" />
+                      <span>
+                        <span className="visually-hidden">You chose: </span>
+                        <RichText text={m.question.options[m.chosen]} />
+                      </span>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
       </div>
     );
   }
@@ -294,84 +300,63 @@ export function Quiz() {
   const score = answers.filter((a) => a.correct).length;
 
   return (
-    <div className={`with-notebook${notebookOpen ? ' is-open' : ''}`}>
     <div className="quiz quiz-asking">
-      <header className="quiz-head">
-        {back}
-        <div className="quiz-status">
-          <span>
-            Question {index + 1} of {questions.length}
-          </span>
-          <span className="hearts" title="Hearts never run out">
-            <Heart size={16} aria-hidden="true" />
-            <InfinityIcon size={16} aria-hidden="true" />
-            <span className="visually-hidden">Unlimited hearts</span>
-          </span>
+      <SessionBar
+        backTo={`/decks/${deck.id}`}
+        backLabel={`Leave quiz, back to ${deck.name}`}
+        title={deck.name}
+        progress={{ value: index + (answered ? 1 : 0), max: questions.length, label: 'Quiz progress' }}
+        left={`Question ${index + 1} of ${questions.length}`}
+        earned={cheers.earned}
+        gain={cheers.gain}
+        notes={{ open: notesOpen, hasNote: currentNote.trim() !== '', onToggle: () => setNotesOpen(!notesOpen) }}
+      />
+
+      <div className="sticky-host">
+        <div className="quiz-card">
+          <h1 className="quiz-question" ref={questionRef} tabIndex={-1}>
+            <RichText text={question.card.front} />
+          </h1>
         </div>
-      </header>
-      <div
-        className="progress-track"
-        role="progressbar"
-        aria-label="Quiz progress"
-        aria-valuemin={0}
-        aria-valuemax={questions.length}
-        aria-valuenow={index + (answered ? 1 : 0)}
-      >
-        <div className="progress-fill" style={{ width: `${((index + (answered ? 1 : 0)) / questions.length) * 100}%` }} />
+
+        <OptionList
+          question={question}
+          chosen={chosen}
+          ruledOut={ruledOut}
+          onChoose={choose}
+        />
+
+        <div className="quiz-foot">
+          {!answered ? (
+            <>
+              <button type="button" className="btn btn-quiet" onClick={ruleOut} disabled={remainingWrong <= 1}>
+                <Lightbulb size={16} aria-hidden="true" />
+                Rule out a wrong answer <kbd>H</kbd>
+              </button>
+              <p className="field-hint">Press 1 to {question.options.length} to answer.</p>
+            </>
+          ) : (
+            <>
+              <p className={`quiz-feedback ${wasRight ? 'is-right' : 'is-wrong'}`} role="status">
+                {wasRight ? (
+                  <>
+                    <Check size={18} aria-hidden="true" /> Right. {score} so far.
+                  </>
+                ) : (
+                  <>
+                    <X size={18} aria-hidden="true" /> Not this one. The right answer is marked.
+                  </>
+                )}
+              </p>
+              <button type="button" className="btn btn-primary" ref={nextRef} onClick={next}>
+                {index + 1 >= questions.length ? 'See results' : 'Next question'} <kbd>Enter</kbd>
+              </button>
+            </>
+          )}
+        </div>
+
+        <StickyNotes cardId={question.card.id} scope={deckId} open={notesOpen} onOpenChange={setNotesOpen} />
       </div>
-
-      {cheers.gain && (
-        <span key={cheers.gain.id} className="xp-float" aria-hidden="true">
-          +{cheers.gain.amount} EXP
-        </span>
-      )}
-      <h1 className="quiz-question" ref={questionRef} tabIndex={-1}>
-        <RichText text={question.card.front} />
-      </h1>
-
-      <OptionList
-        question={question}
-        chosen={chosen}
-        ruledOut={ruledOut}
-        onChoose={choose}
-      />
-
-      <div className="quiz-foot">
-        {!answered ? (
-          <>
-            <button type="button" className="btn btn-quiet" onClick={ruleOut} disabled={remainingWrong <= 1}>
-              <KeyRound size={16} aria-hidden="true" />
-              Rule out a wrong answer <kbd>H</kbd>
-              <span className="keys-left">({keys} {keys === 1 ? 'key' : 'keys'} left)</span>
-            </button>
-            <p className="field-hint">Press 1 to {question.options.length} to answer.</p>
-          </>
-        ) : (
-          <>
-            <p className={`quiz-feedback ${wasRight ? 'is-right' : 'is-wrong'}`} role="status">
-              {wasRight ? (
-                <>
-                  <Check size={18} aria-hidden="true" /> Right. {score} so far.
-                </>
-              ) : (
-                <>
-                  <X size={18} aria-hidden="true" /> Not this one. The right answer is marked.
-                </>
-              )}
-            </p>
-            <button type="button" className="btn btn-primary" ref={nextRef} onClick={next}>
-              {index + 1 >= questions.length ? 'See results' : 'Next question'} <kbd>Enter</kbd>
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-      <Notebook
-        scope={deckId}
-        open={notebookOpen}
-        onOpenChange={setNotebookOpen}
-        current={{ question: plainText(question.card.front), answer: plainText(question.card.back) }}
-      />
     </div>
   );
 }

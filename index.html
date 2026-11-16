@@ -28,6 +28,7 @@
             if (old === 'light' || old === 'dark') s.theme = old;
           }
         } catch (e) {}
+        if (s.font === 'pixel') s.font = 'arcade';
         root.dataset.theme = s.theme === 'system'
           ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : s.theme;

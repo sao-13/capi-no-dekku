@@ -11,6 +11,7 @@ const TYPES: { type: CardType; label: string; note: string }[] = [
   { type: 'cloze', label: 'Cloze', note: 'Hide words in a sentence. Each hidden part is asked on its own.' },
   { type: 'occlusion', label: 'Image occlusion', note: 'Hide labels on a picture. Each box is asked on its own.' },
   { type: 'mcq', label: 'Gizmo Style', note: 'Multiple choice: your question, one correct answer and three wrong ones. Choices are shuffled every time.' },
+  { type: 'typein', label: 'Type-in', note: 'Type the answer from memory. Small typos are forgiven.' },
 ];
 
 export interface CardEditorHandle {
@@ -71,12 +72,12 @@ export const CardEditor = forwardRef<CardEditorHandle, Props>(function CardEdito
 
       {value.type === 'occlusion' && <OcclusionEditor draft={value} onChange={onChange} idPrefix={idPrefix} />}
 
-      {(value.type === 'basic' || value.type === 'reversed') && (
+      {(value.type === 'basic' || value.type === 'reversed' || value.type === 'typein') && (
         <div className="card-editor-sides">
           <FormatField
             ref={frontRef}
             id={`${idPrefix}-front`}
-            label="Front"
+            label={value.type === 'typein' ? 'Question' : 'Front'}
             value={value.front}
             onChange={(front) => set({ front })}
             onSubmit={onSubmit}
@@ -89,7 +90,7 @@ export const CardEditor = forwardRef<CardEditorHandle, Props>(function CardEdito
           <FormatField
             ref={backRef}
             id={`${idPrefix}-back`}
-            label="Back"
+            label={value.type === 'typein' ? 'Answer' : 'Back'}
             value={value.back}
             onChange={(back) => set({ back })}
             onSubmit={onSubmit}

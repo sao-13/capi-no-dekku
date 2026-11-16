@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Check, FileUp, FolderOpen, ListChecks, NotebookPen, Pencil, Play, Search, Trash2, X } from 'lucide-react';
+import { ArrowLeft, Check, FileUp, FolderOpen, ListChecks, NotebookPen, Pencil, Play, RotateCcw, Search, Trash2, X } from 'lucide-react';
 import { CardEditor } from '../components/CardEditor';
 import { CardSummary } from '../components/CardContent';
 import { draftFromCard, draftToInput, emptyDraft, nextDraft, validateDraft, type CardDraft } from '../lib/draft';
@@ -8,12 +8,12 @@ import { plainText } from '../lib/markup';
 import { EmptyState } from '../components/EmptyState';
 import { ConfirmDialog } from '../components/Dialog';
 import { DeckFormDialog } from '../components/DeckFormDialog';
-import { addCard, deleteCard, deleteDeck, restoreCard, updateCard, updateDeck, useData } from '../lib/store';
+import { addCard, deleteCard, deleteDeck, resetCards, restoreCard, restoreSchedules, updateCard, updateDeck, useData } from '../lib/store';
 import { cardsInDeck, summarizeDeck } from '../lib/deckStats';
-import { cardStatus, isDue, nextDueDay, TYPE_LABEL, typeOf } from '../lib/srs';
-import { formatRelativeDay, plural, todayKey } from '../lib/dates';
+import { CATEGORY_LABEL, cardCategory, isNewCard, latestGrades, TYPE_LABEL, typeOf, type CardCategory } from '../lib/srs';
+import { plural } from '../lib/dates';
 import { showToast } from '../lib/toast';
-import type { Card } from '../lib/types';
+import type { Card, CardType } from '../lib/types';
 import './DeckDetail.css';
 
 export function DeckDetail() {
@@ -23,16 +23,26 @@ export function DeckDetail() {
   const deck = data.decks.find((d) => d.id === deckId);
   const [editing, setEditing] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingReset, setConfirmingReset] = useState(false);
   const [filter, setFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<CardCategory | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<CardType | 'all'>('all');
   const [announcement, setAnnouncement] = useState('');
-  const today = todayKey();
 
   const cards = useMemo(() => cardsInDeck(data, deckId), [data, deckId]);
-  const summary = useMemo(() => summarizeDeck(data, deckId, today), [data, deckId, today]);
+  const summary = useMemo(() => summarizeDeck(data, deckId), [data, deckId]);
+  const grades = useMemo(() => latestGrades(data.reviews), [data.reviews]);
+  const categories = useMemo(() => new Map(cards.map((c) => [c.id, cardCategory(c, grades)])), [cards, grades]);
   const visibleCards = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    return q ? cards.filter((c) => c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q)) : cards;
-  }, [cards, filter]);
+    return cards.filter(
+      (c) =>
+        (!q || c.front.toLowerCase().includes(q) || c.back.toLowerCase().includes(q)) &&
+        (categoryFilter === 'all' || categories.get(c.id) === categoryFilter) &&
+        (typeFilter === 'all' || typeOf(c) === typeFilter),
+    );
+  }, [cards, filter, categoryFilter, typeFilter, categories]);
+  const filtering = filter.trim() !== '' || categoryFilter !== 'all' || typeFilter !== 'all';
 
   if (!deck) {
     return (
@@ -54,7 +64,14 @@ export function DeckDetail() {
     );
   }
 
-  const nextDue = cards.length && summary.due === 0 ? cards.map(nextDueDay).sort()[0] : null;
+  const focusCardsHeading = () => requestAnimationFrame(() => document.getElementById('cards-heading')?.focus());
+
+  function clearFilters() {
+    setFilter('');
+    setCategoryFilter('all');
+    setTypeFilter('all');
+    focusCardsHeading();
+  }
 
   return (
     <div className="page">
@@ -70,6 +87,12 @@ export function DeckDetail() {
               <Pencil size={16} aria-hidden="true" />
               Edit details
             </button>
+            {summary.studied > 0 && (
+              <button type="button" className="btn btn-quiet" onClick={() => setConfirmingReset(true)}>
+                <RotateCcw size={16} aria-hidden="true" />
+                Reset studied cards
+              </button>
+            )}
             <button type="button" className="btn btn-quiet btn-danger" onClick={() => setConfirmingDelete(true)}>
               <Trash2 size={16} aria-hidden="true" />
               Delete deck
@@ -80,13 +103,13 @@ export function DeckDetail() {
         <p className="deck-summary">
           {cards.length === 0
             ? 'No cards yet.'
-            : `${plural(summary.total, 'card')}. ${summary.due > 0 ? `${summary.due} due today` : `Nothing due until ${formatRelativeDay(nextDue!)}`}, ${summary.mastered} mastered.`}
+            : `${plural(summary.total, 'card')}. ${summary.fresh} new, ${summary.studied} studied.`}
         </p>
         {cards.length > 0 && (
           <div className="btn-row deck-actions">
             <Link to={`/decks/${deck.id}/study`} className="btn btn-primary btn-lg">
               <Play size={16} aria-hidden="true" />
-              {summary.due > 0 ? `Study ${plural(summary.due, 'due card')}` : 'Study ahead'}
+              Review
             </Link>
             <Link to={`/decks/${deck.id}/quiz`} className="btn btn-lg">
               <ListChecks size={16} aria-hidden="true" />
@@ -111,22 +134,56 @@ export function DeckDetail() {
       </section>
 
       <section className="section" aria-labelledby="cards-heading">
-        <div className="section-head">
+        <div className="section-head deck-cards-head">
           <h2 id="cards-heading" tabIndex={-1}>
             Cards
           </h2>
-          {cards.length > 6 && (
-            <label className="search-field">
-              <Search size={16} aria-hidden="true" />
-              <span className="visually-hidden">Filter cards</span>
-              <input
-                className="input"
-                type="search"
-                placeholder="Filter cards"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
-            </label>
+          {(cards.length > 6 || filtering) && (
+            <div className="card-filters">
+              <label className="search-field">
+                <Search size={16} aria-hidden="true" />
+                <span className="visually-hidden">Filter cards</span>
+                <input
+                  className="input"
+                  type="search"
+                  placeholder="Filter cards"
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                />
+              </label>
+              <label className="visually-hidden" htmlFor="card-filter-category">
+                Category
+              </label>
+              <select
+                id="card-filter-category"
+                className="select"
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value as CardCategory | 'all')}
+              >
+                <option value="all">All categories</option>
+                {(Object.keys(CATEGORY_LABEL) as CardCategory[]).map((k) => (
+                  <option key={k} value={k}>
+                    {CATEGORY_LABEL[k]}
+                  </option>
+                ))}
+              </select>
+              <label className="visually-hidden" htmlFor="card-filter-type">
+                Card type
+              </label>
+              <select
+                id="card-filter-type"
+                className="select"
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value as CardType | 'all')}
+              >
+                <option value="all">All types</option>
+                {(Object.keys(TYPE_LABEL) as CardType[]).map((k) => (
+                  <option key={k} value={k}>
+                    {TYPE_LABEL[k]}
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
         </div>
         {cards.length === 0 ? (
@@ -144,14 +201,26 @@ export function DeckDetail() {
             cards as you read.
           </EmptyState>
         ) : visibleCards.length === 0 ? (
-          <p className="muted">No cards contain "{filter}".</p>
+          <div className="card-filter-empty">
+            <p className="muted">
+              {categoryFilter === 'all' && typeFilter === 'all' ? `No cards contain "${filter}".` : 'No cards match these filters.'}
+            </p>
+            <button type="button" className="btn btn-sm" onClick={clearFilters}>
+              Clear filters
+            </button>
+          </div>
         ) : (
           <ol className="card-list">
             {visibleCards.map((card) => (
               <CardRow
                 key={card.id}
                 card={card}
-                today={today}
+                category={categories.get(card.id) ?? 'new'}
+                onReset={() => {
+                  const previous = resetCards([card.id]);
+                  if (previous.length)
+                    showToast('Card reset to new.', { action: { label: 'Undo', onClick: () => restoreSchedules(previous) } });
+                }}
                 onDelete={() => {
                   const removed = deleteCard(card.id);
                   if (removed) showToast('Card deleted.', { action: { label: 'Undo', onClick: () => restoreCard(removed) } });
@@ -193,6 +262,21 @@ export function DeckDetail() {
           deleteDeck(deck.id);
           showToast(`Deleted "${deck.name}".`);
           navigate('/decks', { replace: true });
+        }}
+      />
+      <ConfirmDialog
+        open={confirmingReset}
+        title={`Reset ${plural(summary.studied, 'studied card')} to new?`}
+        body="They will be asked as new cards again. Your streak, EXP and activity history stay as they are."
+        confirmLabel="Reset cards"
+        cancelLabel="Cancel"
+        onClose={() => setConfirmingReset(false)}
+        onConfirm={() => {
+          const previous = resetCards(cards.filter((c) => !isNewCard(c)).map((c) => c.id));
+          setConfirmingReset(false);
+          showToast(`${plural(previous.length, 'card')} reset to new.`);
+          // The button that opened the dialog is gone now that nothing is studied.
+          focusCardsHeading();
         }}
       />
     </div>
@@ -249,15 +333,23 @@ function AddCardForm({ deckId, onAdded }: { deckId: string; onAdded: () => void 
   );
 }
 
-const STATUS_LABEL = { new: 'New', learning: 'Learning', mastered: 'Mastered' } as const;
+const CATEGORY_TAG: Record<CardCategory, string> = { new: '', easy: ' is-mastered', recall: '', weak: ' is-due' };
 
-function CardRow({ card, today, onDelete }: { card: Card; today: string; onDelete: () => void }) {
+function CardRow({
+  card,
+  category,
+  onReset,
+  onDelete,
+}: {
+  card: Card;
+  category: CardCategory;
+  onReset: () => void;
+  onDelete: () => void;
+}) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<CardDraft>(() => draftFromCard(card));
   const [error, setError] = useState<string | null>(null);
   const editButton = useRef<HTMLButtonElement>(null);
-  const status = cardStatus(card);
-  const due = isDue(card, today) && status !== 'new';
   const type = typeOf(card);
   const label = plainText(card.front).slice(0, 60) || TYPE_LABEL[type];
 
@@ -308,9 +400,9 @@ function CardRow({ card, today, onDelete }: { card: Card; today: string; onDelet
       <CardSummary card={card} />
       <div className="card-meta">
         {type !== 'basic' && <span className="tag">{TYPE_LABEL[type]}</span>}
-        <span className={`tag${due ? ' is-due' : status === 'mastered' ? ' is-mastered' : ''}`}>
+        <span className={`tag${CATEGORY_TAG[category]}`}>
           <span className="tag-dot" aria-hidden="true" />
-          {due ? 'Due' : STATUS_LABEL[status]}
+          {CATEGORY_LABEL[category]}
         </span>
         <button
           ref={editButton}
@@ -325,6 +417,21 @@ function CardRow({ card, today, onDelete }: { card: Card; today: string; onDelet
         >
           <Pencil size={16} aria-hidden="true" />
         </button>
+        {category !== 'new' && (
+          <button
+            type="button"
+            className="icon-btn"
+            aria-label="Reset this card to new"
+            title="Reset to new"
+            onClick={() => {
+              onReset();
+              // The reset button leaves with the card's studied state, and a filter may hide the whole row.
+              requestAnimationFrame(() => (editButton.current ?? document.getElementById('cards-heading'))?.focus());
+            }}
+          >
+            <RotateCcw size={16} aria-hidden="true" />
+          </button>
+        )}
         <button type="button" className="icon-btn danger" aria-label={`Delete card: ${label}`} title="Delete" onClick={onDelete}>
           <Trash2 size={16} aria-hidden="true" />
         </button>

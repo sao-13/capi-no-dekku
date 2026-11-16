@@ -60,6 +60,36 @@
   gap: var(--s2);
 }
 
+/* Card filters: text, category and type in one row, wrapping under the heading on narrow screens */
+
+.deck-cards-head {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.card-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s1);
+}
+
+.card-filters .search-field {
+  width: 200px;
+}
+
+.card-filters .select {
+  width: auto;
+  min-height: 36px;
+  padding-block: var(--s-half);
+}
+
+.card-filter-empty {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+}
+
 /* Card list: front in serif, back in sans, like a two-column glossary */
 
 .card-list {
@@ -121,6 +151,19 @@
 @media (max-width: 760px) {
   .add-card-sides {
     grid-template-columns: 1fr;
+  }
+
+  .card-filters {
+    width: 100%;
+  }
+
+  .card-filters .search-field {
+    width: 100%;
+  }
+
+  .card-filters .select {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .card-row {

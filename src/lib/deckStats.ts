@@ -1,26 +1,26 @@
-import { dueItems, isMastered } from './srs';
-import type { AppData, Card, DayKey, Id } from './types';
+import { isNewCard } from './srs';
+import type { AppData, Card, Id } from './types';
 
 export interface DeckSummary {
   total: number;
-  due: number;
+  /** Cards never studied. */
   fresh: number;
-  mastered: number;
+  /** Cards studied at least once. */
+  studied: number;
   lastStudied: number | null;
 }
 
-export function summarizeDeck(data: AppData, deckId: Id, today: DayKey): DeckSummary {
+export function summarizeDeck(data: AppData, deckId: Id): DeckSummary {
   const cards = data.cards.filter((c) => c.deckId === deckId);
   let lastStudied: number | null = null;
   for (const r of data.reviews) {
     if (r.deckId === deckId && (lastStudied === null || r.ts > lastStudied)) lastStudied = r.ts;
   }
+  const fresh = cards.filter(isNewCard).length;
   return {
     total: cards.length,
-    /** Review items due: a reversed card can count twice, a cloze card once per deletion. */
-    due: cards.reduce((n, c) => n + dueItems(c, today).length, 0),
-    fresh: cards.filter((c) => c.srs.reps === 0).length,
-    mastered: cards.filter(isMastered).length,
+    fresh,
+    studied: cards.length - fresh,
     lastStudied,
   };
 }

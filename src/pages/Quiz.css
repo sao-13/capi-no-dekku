@@ -10,34 +10,16 @@
   gap: var(--s3);
 }
 
-.quiz-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s2);
-}
-
-.quiz-status {
-  display: flex;
-  align-items: center;
-  gap: var(--s2);
-  font-size: var(--fs-sm);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.hearts {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px var(--s1);
+/* The question on flat paper, like the study card. */
+.quiz-card {
+  padding: var(--s4) var(--s5);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--accent-ink);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.06);
 }
 
 .quiz-question {
-  padding-top: var(--s2);
   font-size: clamp(var(--fs-lg), 3.2vw, var(--fs-xl));
   font-weight: 500;
   line-height: var(--lh-snug);
@@ -57,6 +39,12 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* Paper behind each option, so a faded (ruled out or passed over) option stays solid over the wallpaper. */
+.options li {
+  border-radius: var(--r-sm);
+  background: var(--bg);
 }
 
 .option {
@@ -151,6 +139,7 @@
   font-weight: 500;
 }
 
+/* A paper strip, so the hint and feedback lines read over any wallpaper. */
 .quiz-foot {
   display: flex;
   flex-wrap: wrap;
@@ -158,6 +147,10 @@
   justify-content: space-between;
   gap: var(--s2);
   min-height: 48px;
+  padding: var(--s1) var(--s2) var(--s1) var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
 }
 
 .quiz-foot .btn-quiet {
@@ -313,6 +306,10 @@
 }
 
 @media (max-width: 760px) {
+  .quiz-card {
+    padding: var(--s3);
+  }
+
   .option {
     grid-template-columns: 28px minmax(0, 1fr);
   }

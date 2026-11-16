@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { todayKey } from './dates';
 import { itemsOf, newSrs, schedule, withVariantSrs } from './srs';
 import { loadData, saveData } from './storage';
-import type { AppData, Card, CardType, Deck, Id, Occlusion, QuizResult, Review } from './types';
+import type { AppData, Card, CardType, Deck, Grade, Id, Occlusion, QuizResult, Review, Srs } from './types';
 
 export type SaveError = 'quota' | 'unavailable' | null;
 export type LoadNotice = { kind: 'recovered'; backupKey: string } | { kind: 'unavailable' } | null;
@@ -180,17 +180,50 @@ export function restoreCard(removed: { card: Card; index: number }) {
   });
 }
 
+export interface CardSchedule {
+  id: Id;
+  srs: Srs;
+  variantSrs?: Record<string, Srs>;
+}
+
+/** Puts cards back to new. Reviews are kept so streaks, EXP and the activity grid don't change. */
+export function resetCards(ids: Id[]): CardSchedule[] {
+  const wanted = new Set(ids);
+  const previous = snapshot.data.cards
+    .filter((c) => wanted.has(c.id))
+    .map<CardSchedule>((c) => ({ id: c.id, srs: c.srs, variantSrs: c.variantSrs }));
+  if (previous.length === 0) return previous;
+  const fresh = newSrs(todayKey());
+  commit((d) => ({
+    ...d,
+    cards: d.cards.map((card) => (wanted.has(card.id) ? { ...card, srs: fresh, variantSrs: undefined } : card)),
+  }));
+  return previous;
+}
+
+/** Undo for resetCards. */
+export function restoreSchedules(previous: CardSchedule[]) {
+  const byId = new Map(previous.map((p) => [p.id, p]));
+  commit((d) => ({
+    ...d,
+    cards: d.cards.map((card) => {
+      const prev = byId.get(card.id);
+      return prev ? { ...card, srs: prev.srs, variantSrs: prev.variantSrs } : card;
+    }),
+  }));
+}
+
 /* Studying */
 
-export function answerStudy(cardId: Id, variant: string, knewIt: boolean) {
+export function answerStudy(cardId: Id, variant: string, grade: Grade) {
   const today = todayKey();
   const now = Date.now();
   commit((d) => {
     const card = d.cards.find((c) => c.id === cardId);
     const item = card && itemsOf(card).find((i) => i.variant === variant);
     if (!card || !item) return d;
-    const review: Review = { id: uid(), cardId, variant, deckId: card.deckId, ts: now, day: today, mode: 'study', correct: knewIt };
-    const next = withVariantSrs(card, variant, schedule(item.srs, knewIt, today, now));
+    const review: Review = { id: uid(), cardId, variant, deckId: card.deckId, ts: now, day: today, mode: 'study', correct: grade === 1, grade };
+    const next = withVariantSrs(card, variant, schedule(item.srs, grade, today, now));
     return {
       ...d,
       cards: d.cards.map((c) => (c.id === cardId ? next : c)),

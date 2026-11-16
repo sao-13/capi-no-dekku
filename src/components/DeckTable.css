@@ -1,39 +1,50 @@
 .deck-table-wrap {
   overflow-x: auto;
+  container-type: inline-size;
 }
 
+/* separate (not collapse) so the band and hover can round their end cells */
 .deck-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: var(--fs-sm);
 }
 
 .deck-table thead th {
-  padding: 0 12px 10px;
+  padding: 0 12px var(--s1);
+  font-size: var(--fs-xs);
   font-weight: 600;
-  color: var(--text);
+  color: var(--muted);
   text-align: left;
+  white-space: nowrap;
   border-bottom: 1px solid var(--border);
 }
 
 .deck-table td,
 .deck-table tbody th {
-  padding: 7px 12px;
+  height: 48px;
+  padding: var(--s1) 12px;
   text-align: left;
+  vertical-align: middle;
   font-weight: 400;
+  line-height: var(--lh-snug);
+  transition: background-color var(--dur) var(--ease);
 }
 
 .deck-table .num {
-  width: 64px;
+  width: 1%;
+  white-space: nowrap;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-.deck-table tbody tr {
-  transition: background-color var(--dur) var(--ease);
+/* Banded rows: a light brown wash from the accent (clears 4.5:1 for all text on it in every theme). */
+.deck-table tbody tr:nth-child(even) > * {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
-.deck-table tbody tr:hover {
+.deck-table tbody tr:hover > * {
   background: var(--surface-raised);
 }
 
@@ -48,6 +59,7 @@
 .deck-table tbody th {
   font-family: var(--font-sans);
   font-weight: 500;
+  overflow-wrap: break-word;
 }
 
 .deck-table-name {
@@ -63,40 +75,63 @@
   color: var(--count-new);
 }
 
-.count-learn {
-  color: var(--count-learn);
-}
-
 .count-due {
   color: var(--count-due);
 }
 
 .deck-table .is-zero {
   color: var(--muted);
-  opacity: 0.6;
 }
 
 .deck-table-when {
   color: var(--muted);
-  white-space: nowrap;
+}
+
+.deck-table-short {
+  display: none;
+}
+
+.deck-table-review {
+  width: 1%;
+  padding-right: var(--s-half) !important;
 }
 
 .deck-table-gear {
-  width: 44px;
-  padding: 0 4px !important;
+  width: 1%;
+  padding: 0 var(--s-half) !important;
 }
 
 .deck-table-gear .icon-btn {
   width: 32px;
   height: 32px;
-  opacity: 0.55;
-}
-
-.deck-table tr:hover .deck-table-gear .icon-btn,
-.deck-table-gear .icon-btn:focus-visible {
-  opacity: 1;
 }
 
 .deck-table-empty {
   padding: var(--s1) 0;
+}
+
+/* Short headings and tighter cells when the table itself is narrow: phones, and Home beside the tomato on laptops */
+@container (max-width: 500px) {
+  .deck-table thead th,
+  .deck-table td,
+  .deck-table tbody th {
+    padding-inline: var(--s-half);
+  }
+
+  .deck-table thead th:first-child,
+  .deck-table tbody th {
+    padding-left: var(--s1);
+  }
+
+  .deck-table-full {
+    display: none;
+  }
+
+  .deck-table-short {
+    display: inline;
+  }
+
+  .deck-table-review .btn svg {
+    display: none;
+  }
 }

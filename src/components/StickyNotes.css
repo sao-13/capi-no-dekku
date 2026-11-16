@@ -1,0 +1,146 @@
+/*
+  Sticky notes: a small 90s word-processor window. A flat title bar, a strip with the two notes,
+  and ruled paper. Square corners and the hard outline of the pop-up bubbles.
+*/
+
+/* The card, its controls and the note. On wide screens the note sits in the gutter right of the column. */
+.sticky-host {
+  position: relative;
+  display: grid;
+  gap: var(--s3);
+}
+
+.sticky-note {
+  display: grid;
+  border: 2px solid var(--sidebar-line);
+  border-radius: 0;
+  background: var(--bg);
+  box-shadow: 4px 5px 0 rgb(0 0 0 / 0.2);
+  transform-origin: top right;
+  animation: sticky-peel-in 200ms var(--ease);
+}
+
+.sticky-note.is-closing {
+  animation: sticky-peel-out 200ms var(--ease) forwards;
+}
+
+@keyframes sticky-peel-in {
+  from {
+    opacity: 0;
+    transform: rotate(-6deg) scale(0.9);
+  }
+}
+
+@keyframes sticky-peel-out {
+  to {
+    opacity: 0;
+    transform: rotate(-6deg) scale(0.9);
+  }
+}
+
+.sticky-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s1);
+  min-height: 40px;
+  padding: 0 var(--s1) 0 12px;
+  background: var(--note-bar);
+  color: var(--note-bar-ink);
+}
+
+.sticky-title {
+  font-family: var(--font-cute);
+  font-size: var(--fs-sm);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  color: var(--note-bar-ink);
+}
+
+.sticky-close {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid var(--note-bar-ink);
+  border-radius: 0;
+  background: transparent;
+  color: var(--note-bar-ink);
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.sticky-close:hover {
+  background: var(--note-bar-ink);
+  color: var(--note-bar);
+}
+
+/* The usual accent ring is too faint on the blue bar. */
+.sticky-close:focus-visible {
+  outline: 2px solid var(--note-bar-ink);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+.sticky-tabs {
+  padding: var(--s1);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.sticky-tabs .segmented {
+  display: flex;
+}
+
+.sticky-tabs .segmented-option {
+  flex: 1;
+}
+
+/* Ruled paper: the 28px line height matches the rules, which scroll with the text. */
+.sticky-paper {
+  display: block;
+  width: 100%;
+  min-height: 224px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  background-color: var(--bg);
+  /* Rules mix toward the control border: plain --border is too faint on the dark themes. */
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in srgb, var(--control-border) 60%, var(--border)) 27px 28px);
+  background-attachment: local;
+  color: var(--text);
+  font-family: var(--font-cute);
+  font-size: var(--fs-base);
+  line-height: 28px;
+  resize: vertical;
+}
+
+.sticky-paper::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+
+.sticky-paper:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+@media (min-width: 1400px) {
+  .sticky-host > .sticky-note {
+    position: absolute;
+    top: 0;
+    left: calc(100% + var(--s3));
+    width: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticky-note,
+  .sticky-note.is-closing {
+    animation: none;
+  }
+}

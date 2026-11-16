@@ -158,7 +158,7 @@
 
 .font-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: var(--s2);
 }
 
@@ -179,11 +179,6 @@
 
 .font-storybook .font-sample-body {
   font-family: 'IBM Plex Sans', sans-serif;
-}
-
-.font-pixel .font-sample-head,
-.font-pixel .font-sample-body {
-  font-family: 'DotGothic16', monospace;
 }
 
 .font-arcade .font-sample-head {

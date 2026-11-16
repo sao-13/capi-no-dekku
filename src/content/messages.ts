@@ -14,10 +14,11 @@ export const TOMATO_NOTES = [
 
 /** (2) Pops up after every ten cards or questions answered in a session. */
 export const EVERY_TEN = [
-  'ten down! ur doing great ✿',
-  'inshallah we got einstein here',
+  'ten down! ur doing great!',
+  'we got einstein here',
   'ten more in the brain bank!',
   'lfg! 10 cards done',
+  'NICE! capi is proud of u',
 ];
 
 /** (3) Pops up when the progress bar reaches the halfway point of a session. */
@@ -29,14 +30,13 @@ export const PROGRESS_HALFWAY = [
 
 /** (4) Pops up after three wrong answers in a row. */
 export const THREE_WRONG = [
-  'god damn! youre retarded!',
-  'it’s okay! mistakes = learning',
-  'slow down a little, u got this',
-  'm-m-mothafucking forest gump!',
+  'take a breather',
+  'u got this!',
+  'lock in!!',
 ];
 
 /** Pops up after five wrong answers in a row. */
-export const FIVE_WRONG = ["pastor nestor's eyeing you wallahi"];
+export const FIVE_WRONG = ['einstein made mistakes too', 'u gotta lock in!'];
 
 /** (5) Pops up after ten right answers in a row. */
 export const TEN_RIGHT = [
@@ -52,7 +52,7 @@ export const DECK_FINISHED = [
 ];
 
 /** Shown when a hint is asked for with no keys left. */
-export const OUT_OF_KEYS = ['oops! ask enzo for more keys.'];
+export const OUT_OF_KEYS = ['oops! ask @ssen.zo for more keys.'];
 
 /** Shown when the level goes up. "{level}" is replaced with the new level. */
 export const LEVEL_UP = ['level up! now Lv {level} ✧', 'Lv {level}!! sugoi~'];

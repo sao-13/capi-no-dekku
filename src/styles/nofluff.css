@@ -1,6 +1,6 @@
 /*
   No fluff mode (Customizations): strips the playful layer for serious studying.
-  Logic-side switches live next to each feature (pop-ups, ding, keys, Capi, timer messages).
+  Logic-side switches live next to each feature (pop-ups, ding, Capi, timer messages).
 */
 
 :root[data-fluff='off'] {
@@ -13,9 +13,8 @@
 :root[data-fluff='off'] .xp,
 :root[data-fluff='off'] .wordmark-ja,
 :root[data-fluff='off'] .xp-float,
+:root[data-fluff='off'] .session-exp,
 :root[data-fluff='off'] .popup-region,
-:root[data-fluff='off'] .keys-left,
-:root[data-fluff='off'] .notebook-tip,
 :root[data-fluff='off'] .bubble {
   display: none !important;
 }
@@ -28,13 +27,15 @@
   box-shadow: none;
 }
 
-/* Plain cards: no ruled lines, no flip turn. */
-:root[data-fluff='off'] .index-face {
-  background-image: none;
-}
-
+/* Plain cards: no flip turn. */
 :root[data-fluff='off'] .index-card-inner {
   transition: none;
+}
+
+/* Sticky notes open and close without the peel, and drop the bubble shadow. */
+:root[data-fluff='off'] .sticky-note {
+  animation: none;
+  box-shadow: none;
 }
 
 /* Things only shown to serious users */

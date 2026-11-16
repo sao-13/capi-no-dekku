@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { ChartLine, House, Layers, Palette, PenLine, Users, type LucideIcon } from 'lucide-react';
 import { Toasts } from './Toasts';
@@ -8,6 +7,7 @@ import { Pomodoro, TimerHost } from './Pomodoro';
 import { PopupHost } from './PopupHost';
 import { XpBadge } from './XpBadge';
 import { Capi } from './Capi';
+import { useRouteFocus } from '../lib/useRouteFocus';
 import './Layout.css';
 
 const NAV: { to: string; label: string; short: string; icon: LucideIcon; end?: boolean }[] = [
@@ -20,21 +20,9 @@ const NAV: { to: string; label: string; short: string; icon: LucideIcon; end?: b
 
 export function Layout() {
   const { pathname } = useLocation();
-  const mainRef = useRef<HTMLElement>(null);
-  const firstRender = useRef(true);
+  const mainRef = useRouteFocus();
   // Home lays out its own floating panels; the studio has its own panes; other pages sit on one sheet.
   const frame = pathname === '/' ? 'bare' : pathname.startsWith('/studio') ? 'wide' : 'sheet';
-  // While studying, the wallpaper steps back a little further.
-  const focus = /\/(study|quiz)$/.test(pathname) || pathname === '/study';
-
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
-    window.scrollTo(0, 0);
-    mainRef.current?.focus({ preventScroll: true });
-  }, [pathname]);
 
   return (
     <>
@@ -81,7 +69,7 @@ export function Layout() {
         </div>
       </header>
 
-      <main id="main" ref={mainRef} tabIndex={-1} className={`stage is-${frame}${focus ? ' is-focus' : ''}`}>
+      <main id="main" ref={mainRef} tabIndex={-1} className={`stage is-${frame}`}>
         <div className="main-inner">
           <StorageNotice />
           {frame === 'sheet' ? (

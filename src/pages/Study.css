@@ -6,21 +6,7 @@
   max-width: 720px;
 }
 
-.study-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s2);
-}
-
-.study-count {
-  font-size: var(--fs-sm);
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
 .study-stage {
-  padding-top: var(--s3);
   perspective: 1600px;
 }
 
@@ -29,14 +15,20 @@
 }
 
 /*
-  The index card: the one ornamented object in the app. A ruled card with a single
-  accent line under the header, like the red rule on a paper index card.
+  The index card: flat paper with a single accent line under the header, like the red rule
+  on a paper index card. It floats on the wallpaper, so it stays solid.
 */
 
 .index-card-inner {
   display: grid;
   transform-style: preserve-3d;
-  transition: transform 200ms var(--ease);
+  /* The one deliberate exception to the 150-200ms motion rule: a card needs this long to read as turning over. */
+  transition: transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Only the turn to the answer animates; the next card arrives face up at once, so its answer never shows mid-turn. */
+.index-card:not(.is-flipped) .index-card-inner {
+  transition: none;
 }
 
 .index-card.is-flipped .index-card-inner {
@@ -47,21 +39,11 @@
   grid-area: 1 / 1;
   display: grid;
   grid-template-rows: auto 1fr;
-  min-height: 336px; /* 56px header + seven 40px rules */
+  min-height: 336px; /* 56px header + seven 40px lines */
   border: 1px solid var(--border);
   border-radius: var(--r-md);
   background-color: var(--bg);
   box-shadow: 0 2px 0 rgb(0 0 0 / 0.06);
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 39px,
-    color-mix(in srgb, var(--border) 70%, transparent) 39px,
-    color-mix(in srgb, var(--border) 70%, transparent) 40px
-  );
-  background-position: 0 56px;
-  background-repeat: no-repeat;
-  background-size: 100% calc(100% - 56px);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   overflow: hidden;
@@ -94,7 +76,7 @@
   font-size: var(--fs-sm);
 }
 
-/* Text sits on the card's 40px rules, like handwriting on a ruled card. */
+/* Text keeps a 40px line, the spacing of the ruled card this used to be. */
 .index-text {
   align-self: start;
   padding: 40px var(--s5) 40px;
@@ -146,9 +128,15 @@
   gap: 12px;
 }
 
+.study-legend {
+  width: fit-content;
+  margin-top: var(--s1);
+  padding: var(--s-half) var(--s1);
+}
+
 .study-answers {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: var(--s2);
 }
 
@@ -156,6 +144,7 @@
   display: grid;
   gap: var(--s-half);
   justify-items: start;
+  align-content: start;
   padding: 12px var(--s2);
   border: 1px solid var(--control-border);
   border-radius: var(--r-sm);
@@ -238,6 +227,7 @@
   }
 
   .study-answers {
+    grid-template-columns: 1fr;
     gap: var(--s1);
   }
 
@@ -247,10 +237,6 @@
 }
 
 /* Formatted and image cards */
-
-.index-card.has-image .index-face {
-  background-image: none;
-}
 
 .index-text .occl {
   margin-top: var(--s1);
@@ -263,41 +249,20 @@
   color: var(--muted);
 }
 
+/* Type-in: the learner's words, marked right and wrong (strikethrough so colour is not the only signal). */
+.typein-typed .is-right {
+  color: var(--success);
+}
+
+.typein-typed .is-wrong {
+  color: var(--danger);
+  text-decoration: line-through;
+}
+
 .index-prompt {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Floating "+10 EXP" after each answer */
-.study {
-  position: relative;
-}
-
-.xp-float {
-  position: absolute;
-  right: 0;
-  top: 44px;
-  font-family: var(--font-cute);
-  font-size: var(--fs-md);
-  color: var(--accent-ink);
-  pointer-events: none;
-  animation: xp-rise 1100ms var(--ease) forwards;
-}
-
-@keyframes xp-rise {
-  0% {
-    opacity: 0;
-    transform: translateY(8px) scale(0.9);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(0) scale(1.05);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-22px);
-  }
 }
 
 /* Hints */
@@ -309,24 +274,22 @@
   color: var(--accent-ink);
 }
 
+/* Loose lines under the card sit on small paper strips, so they read over any wallpaper. */
+.hint-row,
+.study-legend,
+.mcq-foot {
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+}
+
 .hint-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--s2);
+  width: fit-content;
   margin-top: var(--s1);
 }
 
 .hint-btn {
-  color: var(--muted);
-}
-
-.keys-left {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-family: var(--font-cute);
-  font-size: var(--fs-xs);
   color: var(--muted);
 }
 
@@ -337,6 +300,12 @@
   margin: 0 0 var(--s2);
   padding: 0;
   list-style: none;
+}
+
+/* Paper behind each choice, so a faded (ruled out or passed over) choice stays solid. */
+.mcq-options li {
+  border-radius: var(--r-sm);
+  background: var(--bg);
 }
 
 .mcq-option {
@@ -419,6 +388,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s2);
+  padding: var(--s1) var(--s1) var(--s1) var(--s2);
 }
 
 .mcq-result {

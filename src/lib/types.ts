@@ -20,7 +20,7 @@ export interface Srs {
   lastReviewed: number | null;
 }
 
-export type CardType = 'basic' | 'reversed' | 'cloze' | 'occlusion' | 'mcq';
+export type CardType = 'basic' | 'reversed' | 'cloze' | 'occlusion' | 'mcq' | 'typein';
 
 /** A rectangle hidden on an image, in fractions (0 to 1) of the image's width and height. */
 export interface Mask {
@@ -66,6 +66,9 @@ export interface Card {
 
 export type ReviewMode = 'study' | 'quiz';
 
+/** Study rating: 1 understood well, 2 almost (back in 5 minutes), 3 didn't understand. */
+export type Grade = 1 | 2 | 3;
+
 export interface Review {
   id: Id;
   cardId: Id;
@@ -75,6 +78,8 @@ export interface Review {
   day: DayKey;
   mode: ReviewMode;
   correct: boolean;
+  /** Study answers only; missing on older reviews. */
+  grade?: Grade;
 }
 
 export interface QuizResult {

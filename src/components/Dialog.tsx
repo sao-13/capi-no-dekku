@@ -53,11 +53,12 @@ interface ConfirmProps {
   title: string;
   body: ReactNode;
   confirmLabel: string;
+  cancelLabel?: string;
   onConfirm: () => void;
   onClose: () => void;
 }
 
-export function ConfirmDialog({ open, title, body, confirmLabel, onConfirm, onClose }: ConfirmProps) {
+export function ConfirmDialog({ open, title, body, confirmLabel, cancelLabel = 'Keep it', onConfirm, onClose }: ConfirmProps) {
   const bodyId = useId();
   return (
     <Dialog open={open} onClose={onClose} title={title} describedBy={bodyId}>
@@ -66,7 +67,7 @@ export function ConfirmDialog({ open, title, body, confirmLabel, onConfirm, onCl
       </p>
       <div className="dialog-actions">
         <button type="button" className="btn" onClick={onClose} autoFocus>
-          Keep it
+          {cancelLabel}
         </button>
         <button type="button" className="btn btn-danger btn-solid" onClick={onConfirm}>
           {confirmLabel}

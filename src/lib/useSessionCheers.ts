@@ -14,6 +14,8 @@ export function useSessionCheers() {
   const wrongRun = useRef(0);
   const halfwayShown = useRef(false);
   const [gain, setGain] = useState<{ id: number; amount: number } | null>(null);
+  /** EXP earned so far this session. */
+  const [earned, setEarned] = useState(0);
 
   const record = useCallback((correct: boolean) => {
     total.current += 1;
@@ -25,7 +27,9 @@ export function useSessionCheers() {
       wrongRun.current += 1;
       rightRun.current = 0;
     }
-    setGain({ id: total.current, amount: correct ? XP.correct : XP.wrong });
+    const amount = correct ? XP.correct : XP.wrong;
+    setGain({ id: total.current, amount });
+    setEarned((e) => e + amount);
 
     // One pop-up at a time; the most pressing wins.
     if (wrongRun.current === 5) showPopup(MESSAGES.fiveWrong, 'warn', 4200);
@@ -49,7 +53,9 @@ export function useSessionCheers() {
     rightRun.current = 0;
     wrongRun.current = 0;
     halfwayShown.current = false;
+    setEarned(0);
+    setGain(null);
   }, []);
 
-  return { record, progress, finished, reset, gain };
+  return { record, progress, finished, reset, gain, earned };
 }

@@ -90,7 +90,7 @@ const SIZE = 72; // 24 px of art at 3x: easy to spot, still out of the way
 const W = SIZE;
 const H = SIZE * (16 / 24);
 const SPEED = 20; // px per second, an amble
-const SURFACES = '.panel, .sheet, .studio-head, .studio-pane, .notebook, .index-card, .tile, .font-tile, .filedrop, .nofluff-card, .mcq-option, .option';
+const SURFACES = '.panel, .sheet, .studio-head, .studio-pane, .sticky-note, .index-card, .tile, .font-tile, .filedrop, .nofluff-card, .mcq-option, .option';
 
 type Mode = 'walk' | 'idle' | 'sleep' | 'startled' | 'held' | 'fall' | 'slide';
 
@@ -103,10 +103,11 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const pick = (pool: string[]) => pool[Math.floor(Math.random() * pool.length)] ?? '';
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** The space Capi lives in: right of the sidebar, above the phone tab bar. */
+/** The space Capi lives in: right of the sidebar, above the phone tab bar. Study and quiz have neither. */
 function world() {
   const narrow = window.innerWidth <= 860;
-  return { left: narrow ? 0 : 244, right: window.innerWidth, ground: window.innerHeight - (narrow ? 66 : 0) - H };
+  const solo = !!document.querySelector('.stage.is-solo');
+  return { left: narrow || solo ? 0 : 244, right: window.innerWidth, ground: window.innerHeight - (narrow && !solo ? 66 : 0) - H };
 }
 
 export function Capi() {

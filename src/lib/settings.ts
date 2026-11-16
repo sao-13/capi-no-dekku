@@ -4,7 +4,7 @@ import { getImage, putImage } from './images';
 /** Look-and-feel choices from the Customizations page. Applied as data attributes on <html>. */
 
 export type ThemePref = 'light' | 'dark' | 'midnight' | 'system';
-export type FontPref = 'storybook' | 'pixel' | 'arcade' | 'soft';
+export type FontPref = 'storybook' | 'arcade' | 'soft';
 export type WallpaperPref = 'cottage' | 'sakura' | 'night' | 'seaside' | 'ivy' | 'autumn' | 'lane' | 'scroll' | 'none' | 'custom';
 
 export interface Settings {
@@ -21,7 +21,7 @@ export interface Settings {
   /** Capi the capybara wandering along the bottom of the page. */
   capi: boolean;
   /**
-   * No fluff mode: no wallpaper, Capi, pop-ups, EXP, keys, doodles or sounds, and plain fonts.
+   * No fluff mode: no wallpaper, Capi, pop-ups, EXP, doodles or sounds, and plain fonts.
    * Overrides the individual choices without changing them, so turning it off restores everything.
    */
   noFluff: boolean;
@@ -45,7 +45,6 @@ export const WALLPAPERS: { id: Exclude<WallpaperPref, 'none' | 'custom'>; label:
 
 export const FONTS: { id: FontPref; label: string; note: string }[] = [
   { id: 'storybook', label: 'Storybook', note: 'Serif headings, clean sans text' },
-  { id: 'pixel', label: 'Pixel', note: 'DotGothic16 everywhere, like an old handheld' },
   { id: 'arcade', label: 'Arcade', note: 'Pixel headings, easy-reading text' },
   { id: 'soft', label: 'Soft round', note: 'Rounded Zen Maru Gothic throughout' },
 ];
@@ -53,7 +52,12 @@ export const FONTS: { id: FontPref; label: string; note: string }[] = [
 function load(): Settings {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...(JSON.parse(raw) as Partial<Settings>) };
+    if (raw) {
+      const saved = JSON.parse(raw);
+      // The Pixel font option was removed; Arcade is the closest look.
+      if (saved && saved.font === 'pixel') saved.font = 'arcade';
+      return { ...DEFAULT_SETTINGS, ...(saved as Partial<Settings>) };
+    }
     // Carry over the theme chosen before customizations existed.
     const oldTheme = localStorage.getItem('margin:theme');
     if (oldTheme === 'light' || oldTheme === 'dark') return { ...DEFAULT_SETTINGS, theme: oldTheme };
@@ -123,7 +127,7 @@ export const customWallpaperUrl = () => customUrl;
 
 export const getSettings = () => settings;
 
-/** True when playful extras (pop-ups, EXP, keys, sounds, Capi) should show. */
+/** True when playful extras (pop-ups, EXP, sounds, Capi) should show. */
 export const fluffOn = () => !settings.noFluff;
 
 export const useSettings = () =>

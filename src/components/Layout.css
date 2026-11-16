@@ -173,6 +173,34 @@ body {
   padding: var(--s3) var(--s3);
 }
 
+/* Study and quiz (FocusLayout): no sidebar or phone bars, so the wallpaper, pop-ups and timer span the whole window. */
+:root:has(.stage.is-solo) {
+  --sidebar-w: 0px;
+  --float-top: 20px;
+}
+
+/* Clip, not hide: the sticky note's peel swings briefly past the window edge and must not cause sideways scroll. */
+.stage.is-solo {
+  overflow-x: clip;
+}
+
+.stage.is-solo .main-inner {
+  max-width: none;
+  padding: var(--s3) var(--s2) var(--s8);
+}
+
+/* A running focus timer floats at the top; move the session bar below it instead of under it. */
+:root:has(.pomo-float) .stage.is-solo .main-inner {
+  padding-top: calc(var(--float-top) + 44px + var(--s1));
+}
+
+/* Their non-session screens keep the usual centred sheet. */
+.stage.is-solo .sheet {
+  width: 100%;
+  max-width: calc(var(--content-max) - var(--s5) * 2);
+  margin-inline: auto;
+}
+
 /* Most pages sit on one cream sheet over the wallpaper. */
 .sheet,
 .panel {
@@ -247,6 +275,14 @@ body {
 
   .stage.is-wide .main-inner {
     padding: var(--s2) var(--s1) calc(64px + var(--s2));
+  }
+
+  .stage.is-solo .main-inner {
+    padding: var(--s2) var(--s1) var(--s8);
+  }
+
+  :root:has(.stage.is-solo) .toast-region {
+    bottom: calc(var(--s2) + env(safe-area-inset-bottom));
   }
 
   .sheet {
